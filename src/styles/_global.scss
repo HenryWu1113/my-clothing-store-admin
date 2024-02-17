@@ -1,4 +1,25 @@
 html,
 body {
   height: 100%;
+
+  .container {
+    max-width: 2520px;
+    padding: 1.5rem 5rem;
+
+    @include xl {
+      padding: 1rem 5rem;
+    }
+
+    @include md {
+      padding: 1rem 2.5rem;
+    }
+
+    @include sm {
+      padding: 1rem;
+    }
+
+    @include xs {
+      padding: 0.5rem;
+    }
+  }
 }
