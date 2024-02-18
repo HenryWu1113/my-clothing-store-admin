@@ -1,5 +1,5 @@
 <template>
-  <div class="staff-management container">
+  <div class="staff-management myContainer">
     <TitleBar pageTitle="員工管理" />
   </div>
 </template>

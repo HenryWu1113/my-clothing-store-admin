@@ -11,24 +11,6 @@
         </div>
       </div>
     </n-dropdown>
-    <LoginModal
-      :isOpen="modalControll.isLoginOpen"
-      :onClose="
-        () => {
-          modalControll.isLoginOpen = false
-        }
-      "
-      :onSwitch="switchRegister"
-    />
-    <RegisterModal
-      :isOpen="modalControll.isRegisterOpen"
-      :onClose="
-        () => {
-          modalControll.isRegisterOpen = false
-        }
-      "
-      :onSwitch="switchLogin"
-    />
   </div>
 </template>
 <style lang="scss" scoped>
@@ -86,15 +68,13 @@
 <script setup lang="ts">
 import { ref, reactive, shallowRef, h, computed, type Ref } from 'vue'
 import {
-  SkullOutline,
-  HeartOutline,
-  CartOutline,
   SunnyOutline,
   PersonCircleOutline as UserIcon,
   ReaderSharp as OrderIcon,
   LogOutOutline as LogoutIcon,
   LogInOutline as LoginIcon,
-  Add as singupIcon
+  Add as singupIcon,
+  BuildOutline
 } from '@vicons/ionicons5'
 import { MenuOutlined, UserOutlined } from '@vicons/antd'
 import { useRouter } from 'vue-router'
@@ -103,10 +83,12 @@ import { NIcon } from 'naive-ui'
 import { useAdminStore } from '@/stores/admin'
 import { storeToRefs } from 'pinia'
 import { useMessage } from 'naive-ui'
+import { useDrawerStore } from '@/stores/drawer'
 
 const router = useRouter()
 const message = useMessage()
 
+const { onOpen } = useDrawerStore()
 const admin = useAdminStore()
 const { isLogin } = storeToRefs(admin)
 
@@ -119,17 +101,10 @@ const modalControll = ref({
 /** 右上 menu (愛心、購物車、畫面主題) */
 const menuArr = shallowRef([
   {
-    key: 'cart',
-    icon: CartOutline,
+    key: 'management',
+    icon: BuildOutline,
     onClick: () => {
-      router.push('/cart')
-    }
-  },
-  {
-    key: 'favorite',
-    icon: HeartOutline,
-    onClick: () => {
-      router.push('/favorite')
+      onOpen()
     }
   },
   {

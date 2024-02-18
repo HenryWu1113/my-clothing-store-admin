@@ -1,7 +1,7 @@
 <template>
   <div class="title-bar">
-    <n-button type="info" dashed @click="onOpen">切換管理頁面</n-button>
     <p>{{ pageTitle }}</p>
+    <slot name="End"></slot>
   </div>
 </template>
 
@@ -9,28 +9,21 @@
 @import '@/styles/styles';
 .title-bar {
   width: 100%;
-  height: 50px;
-  border-radius: 10px;
-  border: 2px solid $light1;
+  height: 80px;
+  // border-radius: 10px;
+  border-bottom: 1px solid $light1;
   display: flex;
   align-items: center;
   padding: 0 1rem;
-  position: relative;
+  justify-content: space-between;
   > p {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 18px;
+    font-size: 2rem;
     font-weight: bold;
   }
 }
 </style>
 <script setup lang="ts">
 import { useDrawerStore } from '@/stores/drawer'
-import { storeToRefs } from 'pinia'
-
-const { onOpen } = useDrawerStore()
 
 const props = defineProps({
   pageTitle: {

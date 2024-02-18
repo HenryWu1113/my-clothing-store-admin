@@ -4,11 +4,6 @@ export const menuSelection = [
     key: 'overview',
     text: '總覽',
     route: 'overview'
-  },
-  {
-    key: 'management',
-    text: '總管理',
-    route: 'staff'
   }
 ]
 
