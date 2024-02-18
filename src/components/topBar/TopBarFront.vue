@@ -1,5 +1,5 @@
 <template>
-  <header class="flex flex-row h-[72px] border-b-[1px] border-black-500 px-4">
+  <header>
     <CategoriesBtns />
     <MunuBtns />
     <n-drawer class="management" v-model:show="isOpen" :width="350" placement="right">
