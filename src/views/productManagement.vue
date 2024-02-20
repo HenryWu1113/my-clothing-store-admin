@@ -16,7 +16,7 @@
       v-if="currentPage === Page.overview"
       ref="dataTableInst"
       :columns="columns"
-      :data="data"
+      :data="products"
       :pagination="pagination"
     />
     <div v-if="currentPage === Page.edit" class="product-setting-wrap">
@@ -174,9 +174,9 @@ import { NButton } from 'naive-ui'
 import { ArrowUndoOutline } from '@vicons/ionicons5'
 import { PictureTwotone } from '@vicons/antd'
 import { useMessage } from 'naive-ui'
+import { api } from '@/plugins/axios'
 
 import TitleBar from '@/components/TitleBar.vue'
-import { transform } from 'typescript'
 
 const message = useMessage()
 
@@ -226,44 +226,45 @@ const columns = [
   }
 ]
 
-const data = [
-  {
-    name: 'product1',
-    price: 1200,
-    sell: true
-  },
-  {
-    name: 'product2',
-    price: 800,
-    sell: false
-  },
-  {
-    name: 'product3',
-    price: 1800,
-    sell: true
-  },
-  {
-    name: 'product4',
-    price: 400,
-    sell: true
-  },
-  {
-    name: 'product5',
-    price: 900,
-    sell: true
-  },
-  {
-    name: 'product6',
-    price: 100,
-    sell: false
-  }
-]
+const products: Ref<any> = ref([
+  // {
+  //   name: 'product1',
+  //   price: 1200,
+  //   sell: true
+  // },
+  // {
+  //   name: 'product2',
+  //   price: 800,
+  //   sell: false
+  // },
+  // {
+  //   name: 'product3',
+  //   price: 1800,
+  //   sell: true
+  // },
+  // {
+  //   name: 'product4',
+  //   price: 400,
+  //   sell: true
+  // },
+  // {
+  //   name: 'product5',
+  //   price: 900,
+  //   sell: true
+  // },
+  // {
+  //   name: 'product6',
+  //   price: 100,
+  //   sell: false
+  // }
+])
 
 // 表單 --------------------
 
 const formRef = ref<any>(null)
 
-const formValue = ref({
+const formValue: Ref<{ [key: string]: any }> = ref({
+  _id: '',
   name: '',
   price: 0,
   stockQuantity: 0,
@@ -341,11 +342,37 @@ const rules = {
   }
 }
 
+async function submitForm() {
+  const fd = new FormData()
+  for (const key in formValue.value) {
+    if (['_id', 'previewImages'].includes(key)) continue
+    else if (['colors', 'sizes', 'tags', 'images'].includes(key)) {
+      for (const val of formValue.value[key]) {
+        fd.append(key, val)
+      }
+    } else {
+      fd.append(key, formValue.value[key])
+    }
+  }
+
+  try {
+    if (formValue.value._id.length === 0) {
+      const { data } = await api('auth').post('/products', fd)
+      products.value.push(data.result)
+      message.success('新增成功')
+    }
+  } catch (error: any) {
+    console.log(error)
+    message.error(error.isAxiosError ? error.response.data.message : error.message)
+  }
+}
+
 const handleValidateClick = (e: MouseEvent) => {
   e.preventDefault()
   formRef.value?.validate((errors: any) => {
     if (!errors) {
       console.log(formValue.value)
+      submitForm()
     } else {
       message.error('不符合驗證')
     }
