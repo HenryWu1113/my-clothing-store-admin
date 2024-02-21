@@ -1,5 +1,8 @@
+<!-- eslint-disable vue/no-unused-vars -->
 <template>
-  <div class="product-management myContainer">
+  <div
+    :class="['product-management', 'myContainer', currentPage === Page.overview ? 'h-screen' : '']"
+  >
     <TitleBar :pageTitle="pageTitle">
       <template #End>
         <n-button v-if="currentPage === Page.overview" @click="currentPage = Page.edit"
@@ -12,13 +15,7 @@
         ></n-icon>
       </template>
     </TitleBar>
-    <n-data-table
-      v-if="currentPage === Page.overview"
-      ref="dataTableInst"
-      :columns="columns"
-      :data="products"
-      :pagination="pagination"
-    />
+
     <div v-if="currentPage === Page.edit" class="product-setting-wrap">
       <n-form ref="formRef" :label-width="80" :model="formValue" :rules="rules" size="large">
         <n-form-item label="商品名稱" path="name">
@@ -121,6 +118,26 @@
         </n-form-item>
       </n-form>
     </div>
+    <MydataTable
+      v-if="currentPage === Page.overview"
+      :tableData="products"
+      :tableMinWidth="tableSetting.tableMinWidth"
+      :tableSetting="tableSetting.tableSetting"
+      :tableColumnWidth="tableSetting.tableColumnWidth"
+      :loading="tableSetting.isLoading"
+    >
+      <template #td4="{ value }">
+        <div>
+          <n-button type="info" ghost>
+            <template #icon>
+              <n-icon :component="PictureTwotone"></n-icon>
+            </template>
+            Info
+          </n-button>
+          <n-button type="error" ghost> Error </n-button>
+        </div>
+      </template>
+    </MydataTable>
   </div>
 </template>
 
@@ -169,7 +186,7 @@
 </style>
 
 <script setup lang="ts">
-import { ref, h, computed, onMounted, type Ref } from 'vue'
+import { ref, h, computed, onMounted, watch, nextTick, type Ref } from 'vue'
 import { NButton } from 'naive-ui'
 import { ArrowUndoOutline } from '@vicons/ionicons5'
 import { PictureTwotone } from '@vicons/antd'
@@ -177,88 +194,67 @@ import { useMessage } from 'naive-ui'
 import { api } from '@/plugins/axios'
 
 import TitleBar from '@/components/TitleBar.vue'
+import MydataTable from '@/components/dataTable/dataTable.vue'
 
 const message = useMessage()
-
-const pagination = ref({ pageSize: 5 })
 
 enum Page {
   overview = '1',
   edit = '2'
 }
 
-const currentPage: Ref<'1' | '2'> = ref(Page.edit)
+const currentPage: Ref<'1' | '2'> = ref(Page.overview)
 
-const columns = [
-  {
-    title: '商品',
-    key: 'name'
-  },
-  {
-    title: '售價',
-    key: 'price',
-    sorter: (a: any, b: any) => a.price - b.price
-  },
-  {
-    title: '上架狀態',
-    key: 'sell',
-    render(row: any) {
-      return row.sell ? '上架中' : '未上架'
+/** 生成圖表框架的設定 */
+const tableSetting: Ref<{
+  isLoading: boolean
+  tableMinWidth: number
+  tableColumnWidth: number[]
+  tableSetting: { order: number; key: string; title: string; sortable: boolean }[]
+}> = ref({
+  isLoading: false,
+  tableMinWidth: 0,
+  tableColumnWidth: [],
+  tableSetting: [
+    {
+      order: 1,
+      key: 'name',
+      title: '產品',
+      sortable: true
     },
-    sorter: {
-      compare: (a: any, b: any) => a.sell - b.sell,
-      multiple: 3
+    {
+      order: 2,
+      key: 'price',
+      title: '價格',
+      sortable: true
+    },
+    {
+      order: 3,
+      key: 'images',
+      title: '圖片',
+      sortable: true
+    },
+    {
+      order: 4,
+      key: '_id',
+      title: '編輯',
+      sortable: false
     }
-  },
-  {
-    title: '編輯',
-    key: 'edit',
-    render(row: any) {
-      return h(
-        NButton,
-        {
-          size: 'small',
-          onClick: () => onOpen(row.name)
-        },
-        '編輯'
-      )
-    }
+  ]
+})
+
+const products: Ref<any> = ref([])
+
+async function getAllProducts() {
+  try {
+    const { data } = await api('auth').get('/products/all')
+    console.log(data)
+    products.value = [...data.result]
+  } catch (error: any) {
+    message.error(error.isAxiosError ? error.response.data.message : error.message)
   }
-]
-
-const products: Ref<any> = ref([
-  // {
-  //   name: 'product1',
-  //   price: 1200,
-  //   sell: true
-  // },
-  // {
-  //   name: 'product2',
-  //   price: 800,
-  //   sell: false
-  // },
-  // {
-  //   name: 'product3',
-  //   price: 1800,
-  //   sell: true
-  // },
-  // {
-  //   name: 'product4',
-  //   price: 400,
-  //   sell: true
-  // },
-  // {
-  //   name: 'product5',
-  //   price: 900,
-  //   sell: true
-  // },
-  // {
-  //   name: 'product6',
-  //   price: 100,
-  //   sell: false
-  // }
-])
-
+}
+getAllProducts()
 // 表單 --------------------
 
 const formRef = ref<any>(null)
@@ -412,21 +408,29 @@ const pageTitle = computed(() => {
   else return '錯誤頁'
 })
 
-onMounted(async () => {
-  const inputImagesRef: HTMLInputElement = document.querySelector('#inputImagesRef')!
+const inputImagesRef: Ref<HTMLInputElement | null> = ref(null)
 
-  console.log(inputImagesRef)
-  inputImagesRef.onchange = function () {
-    formValue.value.images = []
-    formValue.value.previewImages = []
+/** 預覽圖片和更新物件值事件 */
+function loadImgAndShow() {
+  formValue.value.images = []
+  formValue.value.previewImages = []
 
-    const files: FileList | null = inputImagesRef.files
-    console.log(files)
+  const files: FileList | null = inputImagesRef.value?.files ?? null
+  console.log(files)
 
-    if (!files || files.length === 0) return
+  if (!files || files.length === 0) return
 
-    // 開始處理第一個文件
-    processImage(files, 0)
+  // 開始處理第一個文件
+  processImage(files, 0)
+}
+
+watch(currentPage, async (newVal) => {
+  await nextTick()
+  inputImagesRef.value = document.querySelector('#inputImagesRef')!
+  if (newVal === Page.edit) {
+    if (inputImagesRef.value === null) return
+    inputImagesRef.value.removeEventListener('change', loadImgAndShow)
+    inputImagesRef.value.addEventListener('change', loadImgAndShow)
   }
 })
 </script>
