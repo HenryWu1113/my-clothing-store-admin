@@ -86,6 +86,7 @@
 @import '@/styles/styles';
 
 .dataWrap {
+  --td-height: 60px;
   height: 100%;
 
   // @include xxl {
@@ -121,6 +122,10 @@
             background: #f6f6f61a;
           }
         }
+        td {
+          padding: 0 9px;
+          height: var(--td-height);
+        }
       }
 
       tr {
@@ -137,8 +142,7 @@
 
       th,
       td {
-        height: 60px;
-        text-align: center;
+        // text-align: center;
         vertical-align: middle;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -153,6 +157,7 @@
       }
 
       th {
+        height: 60px;
         position: sticky;
         top: 0;
         left: 0;
@@ -214,7 +219,7 @@
           height: 100%;
           display: flex;
           align-items: center;
-          justify-content: center;
+          // justify-content: center;
 
           > .state-btn {
             width: 80px;
@@ -397,6 +402,11 @@ const props = defineProps({
     type: Array as () => number[],
     default: () => []
   },
+  /** td 自定義高度 */
+  tdHeight: {
+    type: Number,
+    default: 60
+  },
   selectedRow: {
     type: String,
     default: ''
@@ -424,7 +434,7 @@ const setWidth = computed(() => (idx: number) => {
 })
 
 /** 依照目前所在的分頁秀指定第幾比到第幾筆的資料 */
-const filterData: ComputedRef<{ [key: string]: string | number }[]> = computed(() => {
+const filterData: ComputedRef<{ [key: string]: any }[]> = computed(() => {
   // 把 sort 過後的資料再做分頁切割
   return sortData.value.slice(
     (paginationPage.value - 1) * pageSizes.value,
@@ -452,10 +462,16 @@ const currentInfo: ComputedRef<string> = computed(() => {
 
 /** 計算目前空間一頁可以顯示多少資料(不會出現 scrollbar) */
 const calWindowHeight = () => {
-  pageSizes.value = Math.floor(tableWrap.value.clientHeight / 60) - 1
+  pageSizes.value = Math.floor((tableWrap.value.clientHeight - 65) / props.tdHeight) || 1
   // 如果在 resize 中目前頁面大於總共分頁數則跳到第一頁
   if (paginationPage.value > Math.ceil(props.tableData.length / pageSizes.value))
     paginationPage.value = 1
+}
+/** 指定 td 預設高度 */
+const assignTdHeight = () => {
+  const dataWrap: HTMLElement = document.querySelector('.dataWrap')!
+  if (!dataWrap) return
+  dataWrap.style.setProperty('--td-height', `${props.tdHeight}px`)
 }
 
 /** 排序
@@ -542,6 +558,7 @@ watch(
 // 計算高度並給 resize 事件持續偵測
 onMounted(() => {
   calWindowHeight()
+  assignTdHeight()
   window.addEventListener('resize', calWindowHeight)
 })
 

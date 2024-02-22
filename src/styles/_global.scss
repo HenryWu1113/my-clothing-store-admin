@@ -9,10 +9,10 @@ body {
   @include scroll;
 
   .myContainer {
-    padding: 96px 20rem 1.5rem 20rem;
+    padding: 96px 15rem 1.5rem 15rem;
 
     @include xl {
-      padding: 88px 10rem 1rem 10rem;
+      padding: 88px 5rem 1rem 5rem;
     }
 
     @include md {
@@ -28,10 +28,15 @@ body {
     }
   }
 
-  .n-image-preview-container {
+  .n-image-preview-container,
+  .n-drawer-container,
+  .n-modal-container {
     z-index: 10000 !important;
   }
-  .n-drawer-container {
-    z-index: 10000 !important;
+
+  .n-modal-container {
+    .n-button--warning-type {
+      background-color: var(--n-color);
+    }
   }
 }

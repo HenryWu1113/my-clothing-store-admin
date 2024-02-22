@@ -11,7 +11,7 @@
         <n-icon
           v-if="currentPage === Page.edit"
           :component="ArrowUndoOutline"
-          @click="currentPage = Page.overview"
+          @click="(currentPage = Page.overview), resetFormValue()"
         ></n-icon>
       </template>
     </TitleBar>
@@ -31,7 +31,7 @@
             <template #prefix> @ </template>
           </n-input-number>
         </n-form-item>
-        <!-- <n-form-item label="打折" path="discount">
+        <n-form-item v-if="false" label="打折" path="discount">
           <n-input-number
             v-model:value="formValue.discount"
             placeholder="請輸入打折"
@@ -40,7 +40,7 @@
           >
             <template #prefix> $ </template>
           </n-input-number>
-        </n-form-item> -->
+        </n-form-item>
         <n-form-item label="服飾性別分類" path="clothingGender">
           <n-radio-group v-model:value="formValue.clothingGender" name="clothingGender">
             <n-space>
@@ -82,7 +82,13 @@
           <n-dynamic-tags v-model:value="formValue.tags" :max="5" />
         </n-form-item>
         <n-form-item class="images-wrap" label="商品圖片(最多三張)" path="images">
-          <input id="inputImagesRef" type="file" accept="image/*" multiple />
+          <input
+            id="inputImagesRef"
+            type="file"
+            accept="image/*"
+            multiple
+            @change="loadImgAndShow"
+          />
           <label for="inputImagesRef">
             <n-icon :component="PictureTwotone"></n-icon>
           </label>
@@ -125,16 +131,22 @@
       :tableSetting="tableSetting.tableSetting"
       :tableColumnWidth="tableSetting.tableColumnWidth"
       :loading="tableSetting.isLoading"
+      :tdHeight="150"
     >
+      <template #td1="{ value }">
+        <n-carousel show-arrow>
+          <img :src="String(srcString)" v-for="srcString in value" :key="srcString" />
+        </n-carousel>
+      </template>
       <template #td4="{ value }">
         <div>
-          <n-button type="info" ghost>
-            <template #icon>
-              <n-icon :component="PictureTwotone"></n-icon>
-            </template>
-            Info
-          </n-button>
-          <n-button type="error" ghost> Error </n-button>
+          <n-tag :type="value ? 'success' : 'info'">{{ value ? '上架中' : '未上架' }}</n-tag>
+        </div>
+      </template>
+      <template #td5="{ value }">
+        <div class="edit-wrap">
+          <n-button type="info" ghost @click="editProduct(value)"> 編輯 </n-button>
+          <n-button type="error" ghost @click="handleConfirm">刪除</n-button>
         </div>
       </template>
     </MydataTable>
@@ -153,6 +165,26 @@
     cursor: pointer;
   }
 
+  // table ----------
+  :deep(.n-carousel) {
+    --n-arrow-color: gray !important;
+
+    .n-carousel__arrow {
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+  }
+
+  .edit-wrap {
+    gap: 5px;
+  }
+
+  // 設定 ----------
   .product-setting-wrap {
     border: 1px solid $light1;
     padding: 1rem;
@@ -190,13 +222,14 @@ import { ref, h, computed, onMounted, watch, nextTick, type Ref } from 'vue'
 import { NButton } from 'naive-ui'
 import { ArrowUndoOutline } from '@vicons/ionicons5'
 import { PictureTwotone } from '@vicons/antd'
-import { useMessage } from 'naive-ui'
+import { useMessage, useDialog } from 'naive-ui'
 import { api } from '@/plugins/axios'
 
 import TitleBar from '@/components/TitleBar.vue'
 import MydataTable from '@/components/dataTable/dataTable.vue'
 
 const message = useMessage()
+const dialog = useDialog()
 
 enum Page {
   overview = '1',
@@ -213,13 +246,13 @@ const tableSetting: Ref<{
   tableSetting: { order: number; key: string; title: string; sortable: boolean }[]
 }> = ref({
   isLoading: false,
-  tableMinWidth: 0,
+  tableMinWidth: 800,
   tableColumnWidth: [],
   tableSetting: [
     {
       order: 1,
-      key: 'name',
-      title: '產品',
+      key: 'images',
+      title: '圖片',
       sortable: true
     },
     {
@@ -230,12 +263,18 @@ const tableSetting: Ref<{
     },
     {
       order: 3,
-      key: 'images',
-      title: '圖片',
+      key: 'name',
+      title: '產品',
       sortable: true
     },
     {
       order: 4,
+      key: 'sell',
+      title: '上架狀態',
+      sortable: true
+    },
+    {
+      order: 5,
       key: '_id',
       title: '編輯',
       sortable: false
@@ -247,12 +286,14 @@ const products: Ref<any> = ref([])
 
 async function getAllProducts() {
   try {
+    tableSetting.value.isLoading = true
     const { data } = await api('auth').get('/products/all')
     console.log(data)
     products.value = [...data.result]
   } catch (error: any) {
     message.error(error.isAxiosError ? error.response.data.message : error.message)
   }
+  tableSetting.value.isLoading = false
 }
 getAllProducts()
 // 表單 --------------------
@@ -338,6 +379,46 @@ const rules = {
   }
 }
 
+function editProduct(_id: string) {
+  console.log(_id)
+  currentPage.value = Page.edit
+  const idx = products.value.findIndex((item: any) => item._id === _id)
+
+  const selectedProduct = products.value[idx]
+
+  console.log(selectedProduct)
+
+  for (const key in formValue.value) {
+    if (key === 'images') {
+      continue
+    } else if (key === 'previewImages') {
+      formValue.value[key] = selectedProduct.images
+    } else if (selectedProduct[key] !== null || selectedProduct[key] !== void 0) {
+      formValue.value[key] = selectedProduct[key]
+    }
+  }
+
+  console.log(formValue.value)
+}
+
+function resetFormValue() {
+  formValue.value = {
+    _id: '',
+    name: '',
+    price: 0,
+    stockQuantity: 0,
+    clothingGender: 'male',
+    clothingPart: 'shirts',
+    colors: [],
+    sizes: [],
+    tags: [],
+    images: [] as any[],
+    previewImages: [] as string[],
+    sell: true,
+    description: ''
+  }
+}
+
 async function submitForm() {
   const fd = new FormData()
   for (const key in formValue.value) {
@@ -353,10 +434,16 @@ async function submitForm() {
 
   try {
     if (formValue.value._id.length === 0) {
-      const { data } = await api('auth').post('/products', fd)
-      products.value.push(data.result)
+      await api('auth').post('/products', fd)
+
       message.success('新增成功')
+      currentPage.value = Page.overview
+      resetFormValue()
+    } else {
+      await api('auth').patch(`/products/${formValue.value._id}`, fd)
+      message.success('更新成功')
     }
+    getAllProducts()
   } catch (error: any) {
     console.log(error)
     message.error(error.isAxiosError ? error.response.data.message : error.message)
@@ -375,8 +462,15 @@ const handleValidateClick = (e: MouseEvent) => {
   })
 }
 
-function onOpen(name: string) {
-  console.log(name)
+const handleConfirm = () => {
+  dialog.warning({
+    title: '刪除商品',
+    content: '確認刪除',
+    positiveText: '刪除',
+    onPositiveClick: async () => {
+      message.success('刪除')
+    }
+  })
 }
 
 function processImage(files: FileList, index: number) {
@@ -404,33 +498,26 @@ function processImage(files: FileList, index: number) {
 /** 標題名切換 */
 const pageTitle = computed(() => {
   if (currentPage.value === Page.overview) return '商品管理'
-  else if (currentPage.value === Page.edit) return '編輯商品'
+  else if (currentPage.value === Page.edit && formValue.value._id.length) return '編輯商品'
+  else if (currentPage.value === Page.edit && !formValue.value._id.length) return '新增商品'
   else return '錯誤頁'
 })
 
-const inputImagesRef: Ref<HTMLInputElement | null> = ref(null)
-
 /** 預覽圖片和更新物件值事件 */
-function loadImgAndShow() {
+function loadImgAndShow(e: Event) {
+  console.log(e)
+
+  const inputElement = e.target as HTMLInputElement
+
   formValue.value.images = []
   formValue.value.previewImages = []
 
-  const files: FileList | null = inputImagesRef.value?.files ?? null
+  const files: FileList | null = inputElement.files ?? null
   console.log(files)
 
-  if (!files || files.length === 0) return
+  if (!files || files.length === 0 || files.length > 3) return
 
   // 開始處理第一個文件
   processImage(files, 0)
 }
-
-watch(currentPage, async (newVal) => {
-  await nextTick()
-  inputImagesRef.value = document.querySelector('#inputImagesRef')!
-  if (newVal === Page.edit) {
-    if (inputImagesRef.value === null) return
-    inputImagesRef.value.removeEventListener('change', loadImgAndShow)
-    inputImagesRef.value.addEventListener('change', loadImgAndShow)
-  }
-})
 </script>
