@@ -118,7 +118,12 @@
           />
         </n-form-item>
         <n-form-item>
-          <n-button strong type="tertiary" attr-type="submit" @click="handleValidateClick"
+          <n-button
+            strong
+            type="tertiary"
+            attr-type="submit"
+            :loading="formValue.loading"
+            @click="handleValidateClick"
             >確認</n-button
           >
         </n-form-item>
@@ -313,7 +318,8 @@ const formValue: Ref<{ [key: string]: any }> = ref({
   images: [] as any[],
   previewImages: [] as string[],
   sell: true,
-  description: ''
+  description: '',
+  loading: false
 })
 
 const rules = {
@@ -379,6 +385,10 @@ const rules = {
   }
 }
 
+/**
+ * 編輯商品
+ * @param _id 商品 _id
+ */
 function editProduct(_id: string) {
   console.log(_id)
   currentPage.value = Page.edit
@@ -401,6 +411,7 @@ function editProduct(_id: string) {
   console.log(formValue.value)
 }
 
+/** 重製 formValue */
 function resetFormValue() {
   formValue.value = {
     _id: '',
@@ -415,14 +426,17 @@ function resetFormValue() {
     images: [] as any[],
     previewImages: [] as string[],
     sell: true,
-    description: ''
+    description: '',
+    loading: false
   }
 }
 
+/** 新增編輯商品送 api */
 async function submitForm() {
+  formValue.value.loading = true
   const fd = new FormData()
   for (const key in formValue.value) {
-    if (['_id', 'previewImages'].includes(key)) continue
+    if (['_id', 'previewImages', 'loading'].includes(key)) continue
     else if (['colors', 'sizes', 'tags', 'images'].includes(key)) {
       for (const val of formValue.value[key]) {
         fd.append(key, val)
@@ -448,8 +462,13 @@ async function submitForm() {
     console.log(error)
     message.error(error.isAxiosError ? error.response.data.message : error.message)
   }
+  formValue.value.loading = false
 }
 
+/**
+ * 新增編輯商品時的格式確認
+ * @param e 點擊事件
+ */
 const handleValidateClick = (e: MouseEvent) => {
   e.preventDefault()
   formRef.value?.validate((errors: any) => {
@@ -462,6 +481,7 @@ const handleValidateClick = (e: MouseEvent) => {
   })
 }
 
+/** 刪除商品 */
 const handleConfirm = () => {
   dialog.warning({
     title: '刪除商品',
@@ -473,6 +493,11 @@ const handleConfirm = () => {
   })
 }
 
+/**
+ * 遞迴處理所有照片成 base64 推到 formValue.previewImages，並將 file 格式推到 formValue.images 陣列中
+ * @param files
+ * @param index
+ */
 function processImage(files: FileList, index: number) {
   if (index >= files.length) {
     console.log('All images processed')
