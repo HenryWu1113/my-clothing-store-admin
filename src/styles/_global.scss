@@ -9,6 +9,8 @@ body {
   @include scroll;
 
   .myContainer {
+    max-width: 2000px;
+    margin: auto;
     padding: 96px 15rem 1.5rem 15rem;
 
     @include xl {
