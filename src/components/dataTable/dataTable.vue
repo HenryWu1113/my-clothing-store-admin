@@ -57,7 +57,7 @@
           </tr>
         </tbody>
       </table>
-      <transition name="advance">
+      <transition name="loadingMask">
         <div class="loadingMask" v-if="loading">
           <div class="loader"></div>
         </div>

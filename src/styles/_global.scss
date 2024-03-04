@@ -2,6 +2,7 @@
   --huan-bg-color: white;
   --huan-text-color: black;
   --huan-border-color: #e5e7eb;
+  --huan-modal-bg-color: rgba(0, 0, 0, 0.3);
 
   --huan-loading-bg-color: rgba(0, 0, 0, 0.05);
   --huan-loading-ball-color: radial-gradient(at 30% 30%, #0000, rgba(104, 104, 104, 0.667))
@@ -10,8 +11,9 @@
 
 html[data-theme='dark'] {
   --huan-bg-color: rgb(24, 24, 24);
-  --huan-text-color: white;
+  --huan-text-color: rgb(230, 230, 230);
   --huan-border-color: #525558;
+  --huan-modal-bg-color: rgba(255, 255, 255, 0.3);
 
   --huan-loading-bg-color: rgba(255, 255, 255, 0.05);
   --huan-loading-ball-color: radial-gradient(at 30% 30%, #0000, rgba(104, 104, 104, 0.667)) yellow;
@@ -64,12 +66,22 @@ body {
   }
 }
 
-.advance-enter-active,
-.advance-leave-active {
+.loadingMask-enter-active,
+.loadingMask-leave-active {
   transition: all 1s ease;
 }
 
-.advance-enter-from,
-.advance-leave-to {
+.loadingMask-enter-from,
+.loadingMask-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.5s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
   opacity: 0;
 }
