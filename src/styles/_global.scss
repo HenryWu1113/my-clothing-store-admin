@@ -1,13 +1,32 @@
 :root {
-  --bg-color: white;
-  --text-color: black;
+  --huan-bg-color: white;
+  --huan-text-color: black;
+  --huan-border-color: #e5e7eb;
+
+  --huan-loading-bg-color: rgba(0, 0, 0, 0.05);
+  --huan-loading-ball-color: radial-gradient(at 30% 30%, #0000, rgba(104, 104, 104, 0.667))
+    rgb(173, 112, 230);
+}
+
+html[data-theme='dark'] {
+  --huan-bg-color: rgb(24, 24, 24);
+  --huan-text-color: white;
+  --huan-border-color: #525558;
+
+  --huan-loading-bg-color: rgba(255, 255, 255, 0.05);
+  --huan-loading-ball-color: radial-gradient(at 30% 30%, #0000, rgba(104, 104, 104, 0.667)) yellow;
 }
 
 html,
 body {
   height: 100%;
+  background-color: $bg-color;
   @include scroll;
+  transition: 0.3s;
 
+  header {
+    transition: 0.3s;
+  }
   .myContainer {
     max-width: 2000px;
     margin: auto;
@@ -33,7 +52,8 @@ body {
   .n-image-preview-container,
   .n-drawer-container,
   .n-modal-container,
-  .n-message-container {
+  .n-message-container,
+  .v-binder-follower-container {
     z-index: 10000 !important;
   }
 
@@ -42,4 +62,14 @@ body {
       background-color: var(--n-color);
     }
   }
+}
+
+.advance-enter-active,
+.advance-leave-active {
+  transition: all 1s ease;
+}
+
+.advance-enter-from,
+.advance-leave-to {
+  opacity: 0;
 }

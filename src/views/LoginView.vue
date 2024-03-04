@@ -36,12 +36,12 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: $dark;
+  background: $text-color;
   .login-wrap {
     width: 500px;
-    border: 1px solid $dark;
+    border: 1px solid $text-color;
     border-radius: 10px;
-    background: $light;
+    background: $bg-color;
     .modal-title {
       position: relative;
       display: flex;

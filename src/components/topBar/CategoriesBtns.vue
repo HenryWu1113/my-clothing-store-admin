@@ -23,9 +23,9 @@
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-    // transition: 0.2s;
+    color: $text-color;
     &:hover {
-      border-bottom: 2px solid $dark;
+      border-bottom: 2px solid $text-color;
     }
   }
 }

@@ -11,12 +11,13 @@
   width: 100%;
   height: 80px;
   // border-radius: 10px;
-  border-bottom: 1px solid $light1;
+  border-bottom: 1px solid $border-color;
   display: flex;
   align-items: center;
   padding: 0 1rem;
   justify-content: space-between;
   > p {
+    color: $text-color;
     font-size: 2rem;
     font-weight: bold;
   }

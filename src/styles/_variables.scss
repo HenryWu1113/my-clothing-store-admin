@@ -8,10 +8,11 @@ $breakpoint-xxl: 1400px;
 $breakpoint-xxxl: 1600px;
 $breakpoint-xxxxl: 1800px;
 
-$light: #fff;
-$light1: #e5e7eb;
-
-$dark: #000;
+$bg-color: var(--huan-bg-color);
+$border-color: var(--huan-border-color);
+$text-color: var(--huan-text-color);
+$loading-bg-color: var(--huan-loading-bg-color);
+$loading-ball-color: var(--huan-loading-ball-color);
 
 $info: #2080f0;
 

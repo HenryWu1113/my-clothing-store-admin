@@ -46,7 +46,7 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    background: $light;
+    background: $bg-color;
     border-radius: 10px;
     width: 40%;
     @include lg {
@@ -86,7 +86,7 @@
     }
 
     .modal-footer {
-      border-top: 1px solid $light1;
+      border-top: 1px solid $border-color;
       padding: 10px;
       .quick-login {
         display: flex;

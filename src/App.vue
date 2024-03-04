@@ -1,5 +1,9 @@
 <template>
-  <n-config-provider :locale="locale" :date-locale="dateLocale" :theme="void 0">
+  <n-config-provider
+    :locale="locale"
+    :date-locale="dateLocale"
+    :theme="isLight ? void 0 : darkTheme"
+  >
     <n-message-provider>
       <n-dialog-provider>
         <n-back-top class="backTop" :right="20" :bottom="20" />
@@ -19,6 +23,9 @@ import type { NLocale, NDateLocale } from 'naive-ui'
 import { useAdminStore } from '@/stores/admin'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
+import useTheme from '@/composables/useTheme'
+
+const { isLight } = useTheme()
 
 const router = useRouter()
 const { getAdmin } = useAdminStore()

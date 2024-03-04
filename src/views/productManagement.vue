@@ -168,6 +168,7 @@
   .n-icon {
     font-size: 2rem;
     cursor: pointer;
+    color: $text-color;
   }
 
   // table ----------
@@ -191,7 +192,7 @@
 
   // 設定 ----------
   .product-setting-wrap {
-    border: 1px solid $light1;
+    border: 1px solid $border-color;
     padding: 1rem;
     .n-form-item {
       --n-label-font-size: 1rem !important;

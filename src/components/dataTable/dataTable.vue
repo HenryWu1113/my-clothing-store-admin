@@ -59,9 +59,7 @@
       </table>
       <transition name="advance">
         <div class="loadingMask" v-if="loading">
-          <div class="ldio-ddght6wzcah">
-            <div></div>
-          </div>
+          <div class="loader"></div>
         </div>
       </transition>
     </div>
@@ -93,21 +91,12 @@
   //   height: calc(100vh - 78px);
   // }
 
-  .radioWrap {
-    padding-bottom: 10px;
-
-    .n-radio {
-      --n-font-size: 1rem !important;
-      --n-text-color: #fffafb !important;
-    }
-  }
-
   .tableWrap {
     overflow-y: auto;
     height: calc(100% - 50px);
 
     // border-radius: 10px;
-    border: 1px solid $light1;
+    border: 1px solid $border-color;
     position: relative;
 
     table {
@@ -117,11 +106,11 @@
       overflow: hidden;
 
       tbody {
-        tr {
-          &:nth-child(odd) {
-            background: #f6f6f61a;
-          }
-        }
+        // tr {
+        //   &:nth-child(odd) {
+        //     background: #f6f6f61a;
+        //   }
+        // }
         td {
           padding: 0 9px;
           height: var(--td-height);
@@ -162,8 +151,8 @@
         top: 0;
         left: 0;
         font-size: 18px;
-        color: $dark;
-        background: #fafafc;
+        color: $text-color;
+        background: $bg-color;
         z-index: 1;
 
         // &:first-child {
@@ -191,7 +180,7 @@
             align-items: center;
 
             > .n-icon {
-              color: #d6d6d6;
+              color: $border-color;
               font-size: 12px;
 
               &.active {
@@ -208,7 +197,7 @@
 
       td {
         font-size: 1rem;
-        color: $dark;
+        color: $text-color;
 
         > .n-icon {
           cursor: pointer;
@@ -219,49 +208,6 @@
           height: 100%;
           display: flex;
           align-items: center;
-          // justify-content: center;
-
-          > .state-btn {
-            width: 80px;
-            height: 26px;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fffafb;
-
-            &.pending {
-              background: #fe6d73;
-            }
-
-            &.processing {
-              background: #96a890;
-            }
-
-            &.processed {
-              background: #3f88c5;
-            }
-
-            &.pause {
-              border: 1px solid #fffafb;
-            }
-          }
-
-          > .detail-btn {
-            width: 100px;
-            height: 26px;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fffafb;
-            background: #75788580;
-            cursor: pointer;
-
-            .n-icon {
-              margin-right: 3px;
-            }
-          }
         }
       }
     }
@@ -274,45 +220,37 @@
       width: 100%;
       height: 100%;
       display: flex;
-      background: rgba(255, 255, 255, 0.05);
-
-      @keyframes ldio-ddght6wzcah {
-        0% {
-          transform: translate(-50%, -50%) rotate(0deg);
-        }
-
-        100% {
-          transform: translate(-50%, -50%) rotate(360deg);
-        }
+      justify-content: center;
+      align-items: center;
+      // background: rgba(0, 0, 0, 0.1);
+      background: $loading-bg-color;
+      .loader {
+        width: 20px;
+        height: 20px;
+        aspect-ratio: 1;
+        animation: l13-0 2s linear infinite;
       }
-
-      .ldio-ddght6wzcah div {
+      .loader::before,
+      .loader::after {
+        content: '';
         position: absolute;
-        width: 30px;
-        height: 30px;
-        border: 4px solid #31c3cb;
-        border-top-color: transparent;
+        inset: 0;
         border-radius: 50%;
+        background: $loading-ball-color;
+        animation: l13-1 0.5s cubic-bezier(0.5, -500, 0.5, 500) infinite;
       }
-
-      .ldio-ddght6wzcah div {
-        animation: ldio-ddght6wzcah 0.8s linear infinite;
-        top: 50%;
-        left: 50%;
+      .loader::after {
+        animation-delay: -0.15s;
       }
-
-      .ldio-ddght6wzcah {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        transform: translateZ(0) scale(1);
-        backface-visibility: hidden;
-        transform-origin: 0 0;
-        /* see note above */
+      @keyframes l13-0 {
+        100% {
+          transform: rotate(360deg);
+        }
       }
-
-      .ldio-ddght6wzcah div {
-        box-sizing: content-box;
+      @keyframes l13-1 {
+        100% {
+          transform: translate(0.5px);
+        }
       }
     }
   }
@@ -334,7 +272,7 @@
 
     .dataTableInfo {
       font-size: 1rem;
-      color: #fffafb;
+      color: $text-color;
       padding-right: 5px;
     }
   }
