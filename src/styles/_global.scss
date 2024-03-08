@@ -7,6 +7,8 @@
   --huan-loading-bg-color: rgba(0, 0, 0, 0.05);
   --huan-loading-ball-color: radial-gradient(at 30% 30%, #0000, rgba(104, 104, 104, 0.667))
     rgb(173, 112, 230);
+  --swiper-theme-color: rgb(24, 24, 24) !important;
+  --swiper-navigation-size: 30px !important;
 }
 
 html[data-theme='dark'] {
@@ -17,6 +19,7 @@ html[data-theme='dark'] {
 
   --huan-loading-bg-color: rgba(255, 255, 255, 0.05);
   --huan-loading-ball-color: radial-gradient(at 30% 30%, #0000, rgba(104, 104, 104, 0.667)) yellow;
+  --swiper-theme-color: white !important;
 }
 
 html,
