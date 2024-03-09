@@ -1,9 +1,11 @@
 :root {
   --huan-bg-color: white;
   --huan-text-color: black;
+  --huan-text-color2: #515054;
   --huan-border-color: #e5e7eb;
   --huan-modal-bg-color: rgba(0, 0, 0, 0.3);
 
+  --huan-loading-bar-color: #ffcc33;
   --huan-loading-bg-color: rgba(0, 0, 0, 0.05);
   --huan-loading-ball-color: radial-gradient(at 30% 30%, #0000, rgba(104, 104, 104, 0.667))
     rgb(173, 112, 230);
@@ -14,9 +16,11 @@
 html[data-theme='dark'] {
   --huan-bg-color: rgb(24, 24, 24);
   --huan-text-color: rgb(230, 230, 230);
+  --huan-text-color2: #d4d4d4;
   --huan-border-color: #525558;
   --huan-modal-bg-color: rgba(255, 255, 255, 0.3);
 
+  --huan-loading-bar-color: #ccaa33;
   --huan-loading-bg-color: rgba(255, 255, 255, 0.05);
   --huan-loading-ball-color: radial-gradient(at 30% 30%, #0000, rgba(104, 104, 104, 0.667)) yellow;
   --swiper-theme-color: white !important;
@@ -58,7 +62,8 @@ body {
   .n-drawer-container,
   .n-modal-container,
   .n-message-container,
-  .v-binder-follower-container {
+  .v-binder-follower-container,
+  .n-loading-bar-container {
     z-index: 10000 !important;
   }
 

@@ -8,6 +8,7 @@ export const useAdminStore = defineStore(
   'admin',
   () => {
     // state
+    const adminId: Ref<string> = ref('')
     const token: Ref<string> = ref('')
     const email: Ref<string> = ref('')
     const address: Ref<string> = ref('')
@@ -37,6 +38,7 @@ export const useAdminStore = defineStore(
       try {
         const { data } = await api('auth').get('/admins')
         console.log(data)
+        adminId.value = data.result._id
         email.value = data.result.email
         address.value = data.result.address ?? ''
         cellphone.value = data.result.cellphone ?? ''
@@ -65,6 +67,7 @@ export const useAdminStore = defineStore(
 
     /** 初始 useUserStore 值 */
     const resetPiniaVal = () => {
+      adminId.value = ''
       token.value = ''
       email.value = ''
       address.value = ''
@@ -78,6 +81,7 @@ export const useAdminStore = defineStore(
     }
 
     return {
+      adminId,
       token,
       email,
       address,

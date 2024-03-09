@@ -4,12 +4,14 @@
     :date-locale="dateLocale"
     :theme="isLight ? void 0 : darkTheme"
   >
-    <n-message-provider>
-      <n-dialog-provider>
-        <n-back-top class="backTop" :right="20" :bottom="20" />
-        <RouterView />
-      </n-dialog-provider>
-    </n-message-provider>
+    <n-loading-bar-provider>
+      <n-message-provider>
+        <n-dialog-provider>
+          <n-back-top class="backTop" :right="20" :bottom="20" />
+          <RouterView />
+        </n-dialog-provider>
+      </n-message-provider>
+    </n-loading-bar-provider>
   </n-config-provider>
 </template>
 
