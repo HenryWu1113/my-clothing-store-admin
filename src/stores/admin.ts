@@ -45,7 +45,8 @@ export const useAdminStore = defineStore(
         name.value = data.result.name ?? ''
         sex.value = data.result.sex ?? ''
         birthday.value = data.result.birthday ?? ''
-        avatar.value = data.result.avatar ?? ''
+        avatar.value =
+          data.result.avatar ?? `https://source.boringavatars.com/beam/160/${adminId.value}`
         backgroundImg.value = data.result.backgroundImg ?? ''
         // theme.value = ''
       } catch (error) {

@@ -11,6 +11,8 @@
     rgb(173, 112, 230);
   --swiper-theme-color: rgb(24, 24, 24) !important;
   --swiper-navigation-size: 30px !important;
+  --huan-footer-background: #cfcfcf;
+  --huan-footer-icon-wrap-background: #e5e7eb;
 }
 
 html[data-theme='dark'] {
@@ -24,6 +26,8 @@ html[data-theme='dark'] {
   --huan-loading-bg-color: rgba(255, 255, 255, 0.05);
   --huan-loading-ball-color: radial-gradient(at 30% 30%, #0000, rgba(104, 104, 104, 0.667)) yellow;
   --swiper-theme-color: white !important;
+  --huan-footer-background: black;
+  --huan-footer-icon-wrap-background: rgba(255, 255, 255, 0.05);
 }
 
 html,
@@ -70,6 +74,12 @@ body {
   .n-modal-container {
     .n-button--warning-type {
       background-color: var(--n-color);
+    }
+  }
+
+  .n-loading-bar-container {
+    .n-loading-bar {
+      --n-color-loading: #2080f0 !important;
     }
   }
 }
