@@ -13,6 +13,19 @@
   --swiper-navigation-size: 30px !important;
   --huan-footer-background: #cfcfcf;
   --huan-footer-icon-wrap-background: #e5e7eb;
+
+  %Neumorphism {
+    box-shadow:
+      5px 5px 10px #d1d1d1,
+      -5px -5px 10px #ffffff;
+    &:hover {
+      // background: linear-gradient(145deg, #ffffff, #e6e6e6);
+      box-shadow:
+        20px 20px 40px #d1d1d1,
+        -20px -20px 40px #ffffff;
+      transform: scale(1.05);
+    }
+  }
 }
 
 html[data-theme='dark'] {
@@ -28,6 +41,19 @@ html[data-theme='dark'] {
   --swiper-theme-color: white !important;
   --huan-footer-background: black;
   --huan-footer-icon-wrap-background: rgba(255, 255, 255, 0.05);
+
+  %Neumorphism {
+    box-shadow:
+      5px 5px 10px #101010,
+      -5px -5px 10px #202020;
+    &:hover {
+      background: linear-gradient(145deg, #1a1a1a, #161616);
+      box-shadow:
+        20px 20px 40px #101010,
+        -20px -20px 40px #202020;
+      transform: scale(1.05);
+    }
+  }
 }
 
 html,

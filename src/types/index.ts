@@ -66,3 +66,16 @@ export interface IRating {
   createdAt: string
   updatedAt: string
 }
+
+/**
+ * 最新消息資料結構格式
+ */
+export interface INews {
+  _id: string
+  title: string
+  content: string
+  image: string
+  show: boolean
+  createdAt: string
+  updatedAt: string
+}
