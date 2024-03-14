@@ -1,13 +1,25 @@
 /* eslint-disable no-prototype-builtins */
+import exp from 'constants'
 import moment from 'moment'
 import 'moment/locale/zh-tw'
 
 moment.locale('zh-tw')
 
-export const numberToCommaString = (number: number) => {
+/**
+ * 轉換數字成有逗號區的的字串
+ * @param number
+ * @returns { string} 逗號區的的字串
+ */
+export function numberToCommaString(number: number): string {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
+/**
+ * 兩個陣列結構是否一樣
+ * @param obj1
+ * @param obj2
+ * @returns {boolean}
+ */
 export function compareObjects(obj1: any, obj2: any): boolean {
   // 检查对象键的数量是否相同
   if (Object.keys(obj1).length !== Object.keys(obj2).length) {
@@ -32,6 +44,33 @@ export function compareObjects(obj1: any, obj2: any): boolean {
   return true
 }
 
+/**
+ * 距離目前時間
+ * @param time
+ * @returns {string}
+ */
 export function timeFromNow(time: string): string {
   return moment(time).locale('zh-tw').fromNow()
+}
+
+/**
+ * 處理後端傳來的時間格式顯示
+ * @param time
+ * @param onlyDate 是否只顯示日期(預設是 false)
+ * @returns {string}
+ */
+export function formatTime(time: string, onlyDate: boolean = false): string {
+  if (new Date(time).toString() === 'Invalid Date') throw new TypeError('錯誤的時間字串')
+  if (onlyDate) return time.slice(0, 10)
+  else return time.slice(0, 19).replace('T', ' ')
+}
+
+/**
+ * 回傳 Ellipsis 字串
+ * @param content 內容
+ * @param words 字數(預設 75)
+ * @returns {string}
+ */
+export function stringEllipsis(content: string, words: number = 75): string {
+  return content.slice(0, words) + (content.length > words ? '...' : '')
 }
