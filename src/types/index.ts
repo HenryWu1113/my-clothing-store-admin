@@ -74,8 +74,21 @@ export interface INews {
   _id: string
   title: string
   content: string
-  image: string
+  image?: string
   show: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+/**
+ * 分類資料結構格式
+ */
+export interface ICategory {
+  _id: string
+  categoryType: string
+  gender: string
+  key: string
+  name: string
   createdAt: string
   updatedAt: string
 }

@@ -67,8 +67,8 @@ body {
     transition: 0.3s;
   }
   .myContainer {
-    max-width: 2000px;
-    margin: auto;
+    // max-width: 2000px;
+    // margin: auto;
     padding: 96px 15rem 1.5rem 15rem;
 
     @include xl {
@@ -128,4 +128,10 @@ body {
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
+}
+
+@keyframes showEffect {
+  100% {
+    opacity: 1;
+  }
 }

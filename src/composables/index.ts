@@ -60,7 +60,7 @@ export function timeFromNow(time: string): string {
  * @returns {string}
  */
 export function formatTime(time: string, onlyDate: boolean = false): string {
-  if (new Date(time).toString() === 'Invalid Date') throw new TypeError('錯誤的時間字串')
+  if (new Date(time).toString() === 'Invalid Date') return ''
   if (onlyDate) return time.slice(0, 10)
   else return time.slice(0, 19).replace('T', ' ')
 }
