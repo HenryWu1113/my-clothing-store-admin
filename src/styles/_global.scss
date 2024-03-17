@@ -69,10 +69,18 @@ body {
   .myContainer {
     // max-width: 2000px;
     // margin: auto;
-    padding: 96px 15rem 1.5rem 15rem;
+    padding: 96px 22rem 1.5rem 22rem;
+
+    @include xxxl {
+      padding: 88px 18rem 1rem 18rem;
+    }
+
+    @include xxl {
+      padding: 88px 14rem 1rem 14rem;
+    }
 
     @include xl {
-      padding: 88px 5rem 1rem 5rem;
+      padding: 88px 10rem 1rem 10rem;
     }
 
     @include md {
@@ -134,4 +142,9 @@ body {
   100% {
     opacity: 1;
   }
+}
+
+%AshowEffect {
+  opacity: 0;
+  animation: showEffect 0.5s linear forwards;
 }

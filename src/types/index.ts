@@ -29,20 +29,25 @@ export interface IOutfit {
   outfitName: string
   description: string
   clerk: {
-    avatar: string
-    height: number
-    weight: number
+    avatar: string | undefined
+    height: number | undefined
+    weight: number | undefined
     sex: string
     _id: string
-    name: string
+    name: string | undefined
+    store: {
+      _id: string
+      name: string
+    }
+    introduce: string | undefined
   }
   images: string[]
   products: {
-    product: string
+    product: IProduct[]
     color: string
     size: string
     _id: string
-  }
+  }[]
   show: boolean
   createdAt: string
   updatedAt: string
