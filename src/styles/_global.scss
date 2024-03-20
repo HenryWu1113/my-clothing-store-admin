@@ -1,5 +1,6 @@
 :root {
   --huan-bg-color: white;
+  --huan-bg-color2: rgb(245, 245, 245);
   --huan-text-color: black;
   --huan-text-color2: #515054;
   --huan-border-color: #e5e7eb;
@@ -30,6 +31,7 @@
 
 html[data-theme='dark'] {
   --huan-bg-color: rgb(24, 24, 24);
+  --huan-bg-color2: rgb(36, 36, 36);
   --huan-text-color: rgb(230, 230, 230);
   --huan-text-color2: #d4d4d4;
   --huan-border-color: #525558;
