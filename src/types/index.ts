@@ -144,3 +144,32 @@ export interface IBrand {
   updatedAt: string
   createdAt: string
 }
+
+/**
+ * 訂單資料結構格式
+ */
+export interface IOrder {
+  _id: string
+  user: string
+  deliveryFee: number
+  deliveryMethod: string
+  orderStatus: string
+  payMethod: string
+  payStatus: string
+  products: {
+    _id: string
+    color: string
+    size: string
+    quantity: number
+    price: number
+    product: IProduct
+  }[]
+  recipientAddress: string
+  recipientEmail?: string
+  recipientName: string
+  recipientPhone: string
+  sendStatus: string
+  totalAmount: number
+  updatedAt: string
+  createdAt: string
+}
