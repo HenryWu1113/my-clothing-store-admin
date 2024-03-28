@@ -74,3 +74,17 @@ export function formatTime(time: string, onlyDate: boolean = false): string {
 export function stringEllipsis(content: string, words: number = 75): string {
   return content.slice(0, words) + (content.length > words ? '...' : '')
 }
+
+/**
+ * 判斷是否為空字串
+ * @param content 內容
+ * @param replaceWords 空值要回傳的內容
+ * @returns {string | T}
+ */
+export function isEmptyString<T extends string | undefined>(
+  content: string,
+  replaceWords: T = '未填寫' as T
+): string | T {
+  if (content.length === 0) return replaceWords
+  return content
+}
