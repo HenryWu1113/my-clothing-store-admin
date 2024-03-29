@@ -173,3 +173,26 @@ export interface IOrder {
   updatedAt: string
   createdAt: string
 }
+
+/**
+ * 管理者(使用者)資料結構格式
+ */
+export interface IAdmin {
+  _id: string
+  account: string
+  address?: string
+  avatar?: string
+  birthday?: string
+  cellphone?: string
+  disabled: boolean
+  email: string
+  height?: number
+  weight?: number
+  introduce?: string
+  name?: string
+  role: string
+  sex: string
+  store: IStore
+  updatedAt: string
+  createdAt: string
+}
