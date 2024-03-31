@@ -12,7 +12,7 @@
     rgb(173, 112, 230);
   --swiper-theme-color: rgb(24, 24, 24) !important;
   --swiper-navigation-size: 30px !important;
-  --huan-footer-background: #cfcfcf;
+  --huan-footer-background: #eeeeee;
   --huan-footer-icon-wrap-background: #e5e7eb;
 
   %Neumorphism {
@@ -41,7 +41,7 @@ html[data-theme='dark'] {
   --huan-loading-bg-color: rgba(255, 255, 255, 0.05);
   --huan-loading-ball-color: radial-gradient(at 30% 30%, #0000, rgba(104, 104, 104, 0.667)) yellow;
   --swiper-theme-color: white !important;
-  --huan-footer-background: black;
+  --huan-footer-background: rgb(19, 19, 19);
   --huan-footer-icon-wrap-background: rgba(255, 255, 255, 0.05);
 
   %Neumorphism {
