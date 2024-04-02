@@ -11,7 +11,7 @@
         <n-icon
           v-if="currentPage === Page.edit"
           :component="ArrowUndoOutline"
-          @click="(currentPage = Page.overview), resetFormValue()"
+          @click="(currentPage = Page.overview), resetFormValue(), (quillInstance = null)"
         ></n-icon>
       </template>
     </TitleBar>
@@ -31,12 +31,12 @@
             <template #prefix> @ </template>
           </n-input-number>
         </n-form-item>
-        <n-form-item v-if="false" label="打折" path="discount">
+        <n-form-item label="打折" path="discountRate">
           <n-input-number
-            v-model:value="formValue.discount"
+            v-model:value="formValue.discountRate"
             placeholder="請輸入打折"
             :min="0"
-            :max="10"
+            :max="100"
           >
             <template #prefix> $ </template>
           </n-input-number>
@@ -82,13 +82,7 @@
           <n-dynamic-tags v-model:value="formValue.tags" :max="5" />
         </n-form-item>
         <n-form-item class="images-wrap" label="商品圖片(最多三張)" path="images">
-          <input
-            id="inputImagesRef"
-            type="file"
-            accept="image/*"
-            multiple
-            @change="loadImgAndShow"
-          />
+          <InputImage id="inputImagesRef" multiple @update-multiple="imageUpdate" />
           <label for="inputImagesRef">
             <n-icon :component="PictureTwotone"></n-icon>
           </label>
@@ -109,7 +103,7 @@
         <n-form-item label="上架狀態" path="sell">
           <n-switch v-model:value="formValue.sell" />
         </n-form-item>
-        <n-form-item label="商品描述" path="description">
+        <n-form-item v-if="false" label="商品描述" path="description">
           <n-input
             v-model:value="formValue.description"
             type="textarea"
@@ -117,6 +111,12 @@
             clearable
           />
         </n-form-item>
+        <QuillEditor
+          theme="snow"
+          toolbar="full"
+          @ready="quillReady"
+          @update:content="updateQuill"
+        />
         <n-form-item>
           <n-button
             strong
@@ -143,12 +143,15 @@
           <img :src="String(srcString)" v-for="srcString in value" :key="srcString" />
         </n-carousel>
       </template>
-      <template #td4="{ value }">
+      <template #td3="{ value }">
+        <div>{{ value }}% OFF</div>
+      </template>
+      <template #td5="{ value }">
         <div>
           <n-tag :type="value ? 'success' : 'info'">{{ value ? '上架中' : '未上架' }}</n-tag>
         </div>
       </template>
-      <template #td5="{ value }">
+      <template #td6="{ value }">
         <div class="edit-wrap">
           <n-button type="info" ghost @click="editProduct(value)"> 編輯 </n-button>
           <n-button type="error" ghost @click="handleConfirm">刪除</n-button>
@@ -219,6 +222,10 @@
         }
       }
     }
+
+    :deep(.ql-container) {
+      height: 300px !important;
+    }
   }
 }
 </style>
@@ -231,8 +238,12 @@ import { PictureTwotone } from '@vicons/antd'
 import { useMessage, useDialog } from 'naive-ui'
 import { api } from '@/plugins/axios'
 
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
+
 import TitleBar from '@/components/TitleBar.vue'
 import MydataTable from '@/components/dataTable/dataTable.vue'
+import InputImage from '@/components/InputImage.vue'
 
 const message = useMessage()
 const dialog = useDialog()
@@ -242,7 +253,7 @@ enum Page {
   edit = '2'
 }
 
-const currentPage: Ref<'1' | '2'> = ref(Page.overview)
+const currentPage: Ref<'1' | '2'> = ref(Page.edit)
 
 /** 生成圖表框架的設定 */
 const tableSetting: Ref<{
@@ -269,12 +280,18 @@ const tableSetting: Ref<{
     },
     {
       order: 3,
+      key: 'discountRate',
+      title: '打折',
+      sortable: true
+    },
+    {
+      order: 4,
       key: 'name',
       title: '產品',
       sortable: true
     },
     {
-      order: 4,
+      order: 5,
       key: 'sell',
       title: '上架狀態',
       sortable: true
@@ -311,6 +328,7 @@ const formValue: Ref<{ [key: string]: any }> = ref({
   name: '',
   price: 0,
   stockQuantity: 0,
+  discountRate: 0,
   clothingGender: 'male',
   clothingPart: 'shirts',
   colors: [],
@@ -373,17 +391,17 @@ const rules = {
       }
       return true
     }
-  },
-  description: {
-    required: true,
-    trigger: ['input', 'blur'],
-    validator(rule: any, value: string) {
-      if (value.length === 0) {
-        return new Error('商品描述必填')
-      }
-      return true
-    }
   }
+  // description: {
+  //   required: true,
+  //   trigger: ['input', 'blur'],
+  //   validator(rule: any, value: string) {
+  //     if (value.length === 0) {
+  //       return new Error('商品描述必填')
+  //     }
+  //     return true
+  //   }
+  // }
 }
 
 /**
@@ -419,6 +437,7 @@ function resetFormValue() {
     name: '',
     price: 0,
     stockQuantity: 0,
+    discountRate: 0,
     clothingGender: 'male',
     clothingPart: 'shirts',
     colors: [],
@@ -494,33 +513,6 @@ const handleConfirm = () => {
   })
 }
 
-/**
- * 遞迴處理所有照片成 base64 推到 formValue.previewImages，並將 file 格式推到 formValue.images 陣列中
- * @param files
- * @param index
- */
-function processImage(files: FileList, index: number) {
-  if (index >= files.length) {
-    console.log('All images processed')
-    return
-  }
-
-  const reader = new FileReader()
-  const file = files[index]
-
-  formValue.value.images.push(file)
-
-  reader.readAsDataURL(file)
-
-  reader.onload = (e: any) => {
-    // console.log(e.target.result) // base64 字符串
-    formValue.value.previewImages.push(e.target.result)
-
-    // 繼續處理下一個文件
-    processImage(files, index + 1)
-  }
-}
-
 /** 標題名切換 */
 const pageTitle = computed(() => {
   if (currentPage.value === Page.overview) return '商品管理'
@@ -529,21 +521,28 @@ const pageTitle = computed(() => {
   else return '錯誤頁'
 })
 
-/** 預覽圖片和更新物件值事件 */
-function loadImgAndShow(e: Event) {
-  console.log(e)
+function imageUpdate(obj: { images: FileList; previewImages: string[] }) {
+  console.log(obj)
+  formValue.value.images = obj.images
+  formValue.value.previewImages = obj.previewImages
+}
 
-  const inputElement = e.target as HTMLInputElement
+/** vue-quill實例 */
+const quillInstance = ref<any>(null)
 
-  formValue.value.images = []
-  formValue.value.previewImages = []
+/**
+ * 元件準備好觸發 ready 賦予實例
+ * @param quill 元件傳出來的實例
+ */
+const quillReady = (quill: any) => {
+  quillInstance.value = quill
+  quillInstance.value.root.innerHTML = formValue.value.description
+  console.log(quill)
+}
 
-  const files: FileList | null = inputElement.files ?? null
-  console.log(files)
-
-  if (!files || files.length === 0 || files.length > 3) return
-
-  // 開始處理第一個文件
-  processImage(files, 0)
+/** 有變化就賦值給 formValue.description */
+const updateQuill = (_: any) => {
+  console.log(quillInstance.value.root.innerHTML)
+  formValue.value.description = quillInstance.value.root.innerHTML
 }
 </script>

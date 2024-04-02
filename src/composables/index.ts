@@ -1,5 +1,4 @@
 /* eslint-disable no-prototype-builtins */
-import exp from 'constants'
 import moment from 'moment'
 import 'moment/locale/zh-tw'
 
