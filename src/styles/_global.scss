@@ -61,9 +61,41 @@ html[data-theme='dark'] {
 html,
 body {
   height: 100%;
+  margin: 0;
   background-color: $bg-color;
   @include scroll;
   transition: 0.3s;
+
+  *,
+  *::before,
+  *::after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  pre {
+    margin: 0;
+  }
+  ul,
+  li {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+  }
+
+  .min-h-screen {
+    min-height: 100vh;
+  }
+
+  .h-screen {
+    height: 100vh;
+  }
 
   header {
     transition: 0.3s;
