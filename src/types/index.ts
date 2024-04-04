@@ -32,7 +32,7 @@ export interface IOutfit {
     avatar: string | undefined
     height: number | undefined
     weight: number | undefined
-    sex: string
+    sex: '男' | '女'
     _id: string
     name: string | undefined
     store: {
@@ -189,9 +189,9 @@ export interface IAdmin {
   height?: number
   weight?: number
   introduce?: string
-  name?: string
-  role: string
-  sex: string
+  name: string
+  role: 'manager' | 'clerk'
+  sex: '男' | '女'
   store: IStore
   updatedAt: string
   createdAt: string

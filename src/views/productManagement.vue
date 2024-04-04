@@ -1,7 +1,11 @@
 <!-- eslint-disable vue/no-unused-vars -->
 <template>
   <div
-    :class="['product-management', 'myContainer', currentPage === Page.overview ? 'h-screen' : '']"
+    :class="[
+      'product-management-page',
+      'myContainer',
+      currentPage === Page.overview ? 'h-screen' : ''
+    ]"
   >
     <TitleBar :pageTitle="pageTitle">
       <template #End>
@@ -164,7 +168,7 @@
 <style scoped lang="scss">
 @import '@/styles/styles';
 
-.product-management {
+.product-management-page {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -237,6 +241,7 @@ import { ArrowUndoOutline } from '@vicons/ionicons5'
 import { PictureTwotone } from '@vicons/antd'
 import { useMessage, useDialog } from 'naive-ui'
 import { api } from '@/plugins/axios'
+import type { IProduct } from '@/types'
 
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
@@ -253,7 +258,7 @@ enum Page {
   edit = '2'
 }
 
-const currentPage: Ref<'1' | '2'> = ref(Page.edit)
+const currentPage: Ref<'1' | '2'> = ref(Page.overview)
 
 /** 生成圖表框架的設定 */
 const tableSetting: Ref<{
@@ -297,7 +302,7 @@ const tableSetting: Ref<{
       sortable: true
     },
     {
-      order: 5,
+      order: 6,
       key: '_id',
       title: '編輯',
       sortable: false
@@ -305,7 +310,7 @@ const tableSetting: Ref<{
   ]
 })
 
-const products: Ref<any> = ref([])
+const products: Ref<IProduct[]> = ref([])
 
 async function getAllProducts() {
   try {
@@ -411,7 +416,7 @@ const rules = {
 function editProduct(_id: string) {
   console.log(_id)
   currentPage.value = Page.edit
-  const idx = products.value.findIndex((item: any) => item._id === _id)
+  const idx = products.value.findIndex((item) => item._id === _id)
 
   const selectedProduct = products.value[idx]
 
@@ -422,7 +427,9 @@ function editProduct(_id: string) {
       continue
     } else if (key === 'previewImages') {
       formValue.value[key] = selectedProduct.images
+      // @ts-ignore
     } else if (selectedProduct[key] !== null || selectedProduct[key] !== void 0) {
+      // @ts-ignore
       formValue.value[key] = selectedProduct[key]
     }
   }

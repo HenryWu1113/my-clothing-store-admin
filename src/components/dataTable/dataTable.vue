@@ -332,7 +332,7 @@ const props = defineProps({
   },
   /** 表格資料 */
   tableData: {
-    type: Array as () => { [key: string]: string | number }[],
+    type: Array as () => any[],
     default: () => []
   },
   /** 表格各欄位寬度設定 */
