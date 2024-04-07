@@ -175,7 +175,25 @@ export interface IOrder {
 }
 
 /**
- * 管理者(使用者)資料結構格式
+ * 使用者資料結構格式
+ */
+export interface IUser {
+  _id: string
+  email: string
+  disabled: boolean
+  address?: string
+  avatar?: string
+  backgroundImg?: string
+  birthday?: string
+  cellphone?: string
+  name?: string
+  sex?: '男' | '女'
+  updatedAt: string
+  createdAt: string
+}
+
+/**
+ * 管理者(員工)資料結構格式
  */
 export interface IAdmin {
   _id: string

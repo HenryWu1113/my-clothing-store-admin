@@ -34,7 +34,7 @@ const router = createRouter({
           component: () => import('../views/OverView.vue'),
           meta: {
             title: `${mainTitle} | 首頁`,
-            login: false,
+            login: true,
             admin: false
           }
         },
@@ -44,8 +44,18 @@ const router = createRouter({
           component: () => import('../views/StaffManagement.vue'),
           meta: {
             title: `${mainTitle} | 員工管理`,
-            login: false,
-            admin: false
+            login: true,
+            admin: true
+          }
+        },
+        {
+          path: 'user',
+          name: 'user',
+          component: () => import('../views/UserManagement.vue'),
+          meta: {
+            title: `${mainTitle} | 使用者管理`,
+            login: true,
+            admin: true
           }
         },
         {
@@ -54,8 +64,8 @@ const router = createRouter({
           component: () => import('../views/ProductManagement.vue'),
           meta: {
             title: `${mainTitle} | 商品管理`,
-            login: false,
-            admin: false
+            login: true,
+            admin: true
           }
         },
         {
@@ -98,7 +108,6 @@ router.beforeEach((to, from, next) => {
   if (admin.isLogin && (to.path === '/login' || to.path === '/')) {
     next('/overview')
   } else if (to.meta.login && !admin.isLogin) {
-    alert('not Auth')
     next('/login')
   } else {
     next()

@@ -84,6 +84,6 @@ export function isEmptyString<T extends string | undefined>(
   content: string,
   replaceWords: T = '未填寫' as T
 ): string | T {
-  if (content.length === 0) return replaceWords
+  if (!content || content.length === 0) return replaceWords
   return content
 }

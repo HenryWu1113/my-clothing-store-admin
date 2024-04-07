@@ -14,6 +14,11 @@ export const managementPages = [
     route: 'staff'
   },
   {
+    key: 'user',
+    text: '使用者管理',
+    route: 'user'
+  },
+  {
     key: 'product',
     text: '商品管理',
     route: 'product'

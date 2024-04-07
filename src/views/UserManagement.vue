@@ -2,7 +2,7 @@
 <template>
   <div
     :class="[
-      'staff-management-page',
+      'user-management-page',
       'myContainer',
       currentPage === Page.overview ? 'h-screen' : ''
     ]"
@@ -10,7 +10,7 @@
     <TitleBar :pageTitle="pageTitle">
       <template #End>
         <n-button v-if="currentPage === Page.overview" @click="currentPage = Page.edit"
-          >新增員工帳號</n-button
+          >新增使用者帳號</n-button
         >
         <n-icon
           v-if="currentPage === Page.edit"
@@ -22,11 +22,16 @@
 
     <div v-if="currentPage === Page.edit" class="staff-setting-wrap">
       <n-form ref="formRef" :label-width="80" :model="formValue" :rules="rules" size="large">
-        <n-form-item label="名稱" path="name">
-          <n-input v-model:value="formValue.name" placeholder="請輸入名稱" clearable />
+        <n-form-item label="暱稱" path="name">
+          <n-input v-model:value="formValue.name" placeholder="請輸入暱稱" clearable />
         </n-form-item>
-        <n-form-item label="帳號" path="account">
-          <n-input v-model:value="formValue.account" placeholder="請輸入帳號" clearable />
+        <n-form-item label="信箱(使用者帳號)" path="email">
+          <n-input
+            v-model:value="formValue.email"
+            :disabled="formValue._id !== ''"
+            placeholder="請輸入信箱"
+            clearable
+          />
         </n-form-item>
         <n-form-item v-if="formValue._id === ''" label="密碼" path="password">
           <n-input v-model:value="formValue.password" placeholder="請輸入密碼" clearable />
@@ -48,17 +53,6 @@
         <n-form-item label="帳號禁用" path="disabled">
           <n-switch v-model:value="formValue.disabled" />
         </n-form-item>
-        <n-form-item label="信箱" path="email">
-          <n-input v-model:value="formValue.email" placeholder="請輸入信箱" clearable />
-        </n-form-item>
-        <n-form-item label="身高" path="height">
-          <n-input-number v-model:value="formValue.height" placeholder="請輸入身高" :min="0">
-          </n-input-number>
-        </n-form-item>
-        <n-form-item label="體重" path="weight">
-          <n-input-number v-model:value="formValue.weight" placeholder="請輸入身高" :min="0">
-          </n-input-number>
-        </n-form-item>
         <n-form-item label="性別" path="sex">
           <n-radio-group v-model:value="formValue.sex" name="sex">
             <n-space>
@@ -66,17 +60,6 @@
               <n-radio value="女" label="女" />
             </n-space>
           </n-radio-group>
-        </n-form-item>
-        <n-form-item label="自我介紹" path="introduce">
-          <n-input
-            v-model:value="formValue.introduce"
-            type="textarea"
-            placeholder="請輸入自我介紹"
-            clearable
-          />
-        </n-form-item>
-        <n-form-item label="店鋪" path="store">
-          <n-select v-model:value="formValue.store" :options="storesOption" />
         </n-form-item>
         <n-form-item>
           <n-button
@@ -92,37 +75,37 @@
     </div>
     <MydataTable
       v-if="currentPage === Page.overview"
-      :tableData="staffs"
+      :tableData="users"
       :tableMinWidth="tableSetting.tableMinWidth"
       :tableSetting="tableSetting.tableSetting"
       :tableColumnWidth="tableSetting.tableColumnWidth"
       :loading="tableSetting.isLoading"
       :tdHeight="150"
     >
-      <template #td5="{ value }">
+      <template #td4="{ value }">
         <div>
           <n-tag size="large" v-if="value" type="error"> 禁用 </n-tag>
           <n-tag size="large" v-else type="success"> 正常 </n-tag>
         </div>
       </template>
-      <template #td6="{ value }">
+      <template #td5="{ value }">
         <div>{{ formatTime(value) }}</div>
       </template>
-      <template #td7="{ value }">
+      <template #td6="{ value }">
         <div class="edit-wrap">
           <n-button type="warning" ghost @click="goDetail(value)">檢視</n-button>
-          <n-button type="info" ghost @click="editStaff(value)"> 編輯 </n-button>
+          <n-button type="info" ghost @click="editUser(value)"> 編輯 </n-button>
         </div>
       </template>
     </MydataTable>
-    <StaffModal :isOpen="isOpen" :onClose="onClose(resetStaffDetail)" :staff="staffDetail" />
+    <UserModal :isOpen="isOpen" :onClose="onClose(resetUserDetail)" :user="userDetail" />
   </div>
 </template>
 
 <style scoped lang="scss">
 @import '@/styles/styles';
 
-.staff-management-page {
+.user-management-page {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -195,29 +178,23 @@ import { ArrowUndoOutline } from '@vicons/ionicons5'
 import { PictureTwotone } from '@vicons/antd'
 import { useMessage, useDialog } from 'naive-ui'
 import { api } from '@/plugins/axios'
-import type { IAdmin, IStore } from '@/types'
+import type { IUser, IStore } from '@/types'
 import { numberToCommaString, compareObjects, formatTime } from '@/composables'
 import { storeToRefs } from 'pinia'
-import { useStaffModalStore } from '@/stores/useStaffModalStore'
+import { useUserModalStore } from '@/stores/useUserModalStore'
 import moment from 'moment'
 
-import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
 import TitleBar from '@/components/TitleBar.vue'
 import MydataTable from '@/components/dataTable/dataTable.vue'
-import StaffModal from '@/components/modals/StaffModal.vue'
+import UserModal from '@/components/modals/UserModal.vue'
 
-const { onOpen, onClose } = useStaffModalStore()
-const { isOpen } = storeToRefs(useStaffModalStore())
+const { onOpen, onClose } = useUserModalStore()
+const { isOpen } = storeToRefs(useUserModalStore())
 
 const message = useMessage()
 const dialog = useDialog()
-
-/** 改 IAdmin 的 store 屬性 */
-type formatIAdmin = Omit<IAdmin, 'store'> & {
-  store: string
-}
 
 enum Page {
   overview = '1',
@@ -245,36 +222,30 @@ const tableSetting: Ref<{
     },
     {
       order: 2,
-      key: 'account',
-      title: '帳號',
-      sortable: true
-    },
-    {
-      order: 3,
       key: 'name',
       title: '名稱',
       sortable: true
     },
     {
-      order: 4,
+      order: 3,
       key: 'email',
       title: '信箱',
       sortable: true
     },
     {
-      order: 5,
+      order: 4,
       key: 'disabled',
       title: '帳號狀態',
       sortable: true
     },
     {
-      order: 6,
+      order: 5,
       key: 'createdAt',
       title: '創建時間',
       sortable: true
     },
     {
-      order: 7,
+      order: 6,
       key: '_id',
       title: '',
       sortable: false
@@ -282,71 +253,37 @@ const tableSetting: Ref<{
   ]
 })
 
-/** 所有員工 */
-const staffs: Ref<IAdmin[]> = ref([])
-/** 所有店鋪 */
-const storesOption = ref<{ value: string; label: string }[]>([])
+/** 所有使用者 */
+const users: Ref<IUser[]> = ref([])
 
-/** 取所有員工 */
-async function getAllStaff() {
+/** 取所有使用者 */
+async function getAllUser() {
   try {
     tableSetting.value.isLoading = true
-    const { data } = await api('auth').get('/admins/all')
+    const { data } = await api('auth').get('/users/all')
     console.log(data)
-    staffs.value = [...data.result]
+    users.value = data.result
   } catch (error: any) {
     message.error(error.isAxiosError ? error.response.data.message : error.message)
   }
   tableSetting.value.isLoading = false
 }
-getAllStaff()
+getAllUser()
 
-/** 取所有店鋪 */
-async function getStores() {
-  try {
-    const { data } = await api().get('/stores')
-    console.log(data)
-    storesOption.value = data.result.map((item: any) => ({
-      value: item._id,
-      label: item.name
-    }))
-    console.log(storesOption.value)
-  } catch (error: any) {
-    message.error(error.isAxiosError ? error.response.data.message : error.message)
-  }
-}
-
-getStores()
 // 表單 --------------------
 
 const formRef = ref<any>(null)
 
-/** 員工詳細資訊 */
-const staffDetail = ref<IAdmin>({
+/** 使用者詳細資訊 */
+const userDetail = ref<IUser>({
   _id: '',
-  account: '',
   disabled: false,
   email: '',
-  name: '',
-  role: 'clerk',
-  sex: '男',
-  store: {
-    _id: '',
-    name: '',
-    phone: '',
-    address: '',
-    position: '',
-    googleMapAddress: '',
-    openingTime: '',
-    sellSeries: [],
-    updatedAt: '',
-    createdAt: ''
-  },
   updatedAt: '',
   createdAt: ''
 })
 
-/** 編輯員工的資訊 */
+/** 編輯使用者的資訊 */
 const formValue: Ref<{ [key: string]: any }> = ref({
   _id: '',
   name: '',
@@ -357,12 +294,7 @@ const formValue: Ref<{ [key: string]: any }> = ref({
   cellphone: '',
   disabled: false,
   email: '',
-  height: 0,
-  weight: 0,
-  introduce: '',
-  role: 'clerk',
   sex: '',
-  store: '',
   loading: false
 })
 
@@ -431,14 +363,14 @@ const rules = {
 
 /**
  * 編輯員工資訊
- * @param _id 員工 _id
+ * @param _id 使用者 _id
  */
-function editStaff(_id: string) {
+function editUser(_id: string) {
   console.log(_id)
   currentPage.value = Page.edit
-  const idx = staffs.value.findIndex((item: any) => item._id === _id)
+  const idx = users.value.findIndex((item: any) => item._id === _id)
 
-  const selectedStaff = staffs.value[idx]
+  const selectedStaff = users.value[idx]
 
   console.log(selectedStaff)
 
@@ -475,56 +407,40 @@ function resetFormValue() {
   }
 }
 
-/** 重製 staffDetail */
-function resetStaffDetail() {
-  staffDetail.value = {
+/** 重製 userDetail */
+function resetUserDetail() {
+  userDetail.value = {
     _id: '',
-    account: '',
     disabled: false,
     email: '',
-    name: '',
-    role: 'clerk',
-    sex: '男',
-    store: {
-      _id: '',
-      name: '',
-      phone: '',
-      address: '',
-      position: '',
-      googleMapAddress: '',
-      openingTime: '',
-      sellSeries: [],
-      updatedAt: '',
-      createdAt: ''
-    },
     updatedAt: '',
     createdAt: ''
   }
 }
-/** 新增編輯員工送 api */
+
+/** 新增編輯使用者送 api */
 async function submitForm() {
   formValue.value.loading = true
   const formObj: any = {}
   for (const key in formValue.value) {
     if (['_id', 'loading'].includes(key)) continue
     else if (formValue.value[key] !== undefined && formValue.value[key] !== '') {
-      if (['height', 'weight'].includes(key) && formValue.value[key] === 0) continue
       formObj[key] = formValue.value[key]
     }
   }
 
   try {
     if (formValue.value._id.length === 0) {
-      await api('auth').post('/admins', formObj)
+      await api('auth').post('/users', formObj)
 
-      message.success('新增員工成功')
+      message.success('新增使用者成功')
       currentPage.value = Page.overview
       resetFormValue()
     } else {
-      await api('auth').patch(`/admins/manager/${formValue.value._id}`, formObj)
-      message.success('更新員工資訊成功')
+      await api('auth').patch(`/users/manager/${formValue.value._id}`, formObj)
+      message.success('更新使用者資訊成功')
     }
-    getAllStaff()
+    getAllUser()
   } catch (error: any) {
     console.log(error)
     message.error(error.isAxiosError ? error.response.data.message : error.message)
@@ -533,7 +449,7 @@ async function submitForm() {
 }
 
 /**
- * 新增編輯員工資訊時的格式確認
+ * 新增編輯使用者資訊時的格式確認
  * @param e 點擊事件
  */
 const handleValidateClick = (e: MouseEvent) => {
@@ -549,26 +465,22 @@ const handleValidateClick = (e: MouseEvent) => {
 }
 
 /**
- * 檢視員工資訊
- * @param _id 員工 _id
+ * 檢視使用者資訊
+ * @param _id 使用者 _id
  */
 async function goDetail(_id: string) {
-  try {
-    const { data } = await api().get(`/admins/clerk/${_id}`)
-    console.log(data)
-    staffDetail.value = data.result
-    onOpen()
-  } catch (error: any) {
-    message.error(error.isAxiosError ? error.response.data.message : error.message)
-  }
-  console.log(staffDetail.value)
+  const idx = users.value.findIndex((item) => item._id === _id)
+  if (idx === -1) return
+  userDetail.value = users.value[idx]
+  onOpen()
+  console.log(userDetail.value)
 }
 
 /** 標題名切換 */
 const pageTitle = computed(() => {
-  if (currentPage.value === Page.overview) return '員工管理'
-  else if (currentPage.value === Page.edit && formValue.value._id.length) return '編輯員工資訊'
-  else if (currentPage.value === Page.edit && !formValue.value._id.length) return '新增員工資訊'
+  if (currentPage.value === Page.overview) return '使用者管理'
+  else if (currentPage.value === Page.edit && formValue.value._id.length) return '編輯使用者資訊'
+  else if (currentPage.value === Page.edit && !formValue.value._id.length) return '新增使用者資訊'
   else return '錯誤頁'
 })
 </script>

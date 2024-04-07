@@ -166,13 +166,6 @@ const options: IoptionsType[] = reactive([
     goPage: true
   },
   {
-    label: '我的訂單',
-    key: 'order',
-    icon: renderIcon(OrderIcon),
-    login: true,
-    goPage: true
-  },
-  {
     label: '登出',
     key: 'logout',
     icon: renderIcon(LogoutIcon),

@@ -4,32 +4,28 @@
       <div v-if="isOpen" class="modal-mask">
         <div class="modal">
           <div class="modal-title">
-            <p>員工資訊</p>
+            <p>使用者資訊</p>
             <n-icon :component="Times" @click="onClose(), addCloseClass()"></n-icon>
           </div>
           <div class="modal-body">
             <div class="avatar-wrap">
-              <n-image object-fit="cover" width="120" v-if="staff.avatar" :src="staff.avatar" />
+              <n-image object-fit="cover" width="120" v-if="user.avatar" :src="user.avatar" />
               <n-image
                 object-fit="cover"
                 width="120"
                 v-else
-                :src="`https://source.boringavatars.com/beam/160/${staff._id}`"
+                :src="`https://source.boringavatars.com/beam/160/${user._id}`"
               />
             </div>
             <div class="info" v-for="info in infoArr" :key="info.key">
               <div>{{ info.title }}</div>
-              <div :class="isEmptyString(staff[info.key]) === '未填寫' ? 'no-info' : ''">
-                {{ isEmptyString(staff[info.key]) }}
+              <div :class="isEmptyString(user[info.key]) === '未填寫' ? 'no-info' : ''">
+                {{ isEmptyString(user[info.key]) }}
               </div>
             </div>
             <div class="info">
-              <div>所屬店鋪</div>
-              <div>{{ isEmptyString(staff.store.name) }}</div>
-            </div>
-            <div class="info">
               <div>創建時間</div>
-              <div>{{ formatTime(staff.createdAt) }}</div>
+              <div>{{ formatTime(user.createdAt) }}</div>
             </div>
           </div>
         </div>
@@ -143,7 +139,7 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 import { Times } from '@vicons/fa'
-import type { IAdmin, IStore } from '@/types'
+import type { IUser, IStore } from '@/types'
 import { useMessage } from 'naive-ui'
 import { isEmptyString, formatTime } from '@/composables'
 import { storeToRefs } from 'pinia'
@@ -159,8 +155,8 @@ const props = defineProps({
     type: Function as () => any,
     require: true
   },
-  staff: {
-    type: Object as () => IAdmin | any,
+  user: {
+    type: Object as () => IUser | any,
     required: true
   }
 })
@@ -201,18 +197,6 @@ const infoArr = [
   {
     key: 'birthday',
     title: '生日'
-  },
-  {
-    key: 'height',
-    title: '身高'
-  },
-  {
-    key: 'weight',
-    title: '體重'
-  },
-  {
-    key: 'introduce',
-    title: '自我介紹'
   }
 ]
 
