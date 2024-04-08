@@ -22,5 +22,10 @@ export const managementPages = [
     key: 'product',
     text: '商品管理',
     route: 'product'
+  },
+  {
+    key: 'store',
+    text: '店鋪管理',
+    route: 'store'
   }
 ]

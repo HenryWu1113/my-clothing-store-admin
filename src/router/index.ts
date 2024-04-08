@@ -69,6 +69,16 @@ const router = createRouter({
           }
         },
         {
+          path: 'store',
+          name: 'store',
+          component: () => import('../views/StoreManagement.vue'),
+          meta: {
+            title: `${mainTitle} | 店鋪管理`,
+            login: true,
+            admin: true
+          }
+        },
+        {
           path: 'profile',
           name: 'profile',
           component: () => import('../views/ProfileView.vue'),
