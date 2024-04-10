@@ -483,6 +483,8 @@ async function submitForm() {
     } else {
       await api('auth').patch(`/products/${formValue.value._id}`, fd)
       message.success('更新成功')
+      // 把 images 先變空才不會重複上傳
+      formValue.value.images = []
     }
     getAllProducts()
   } catch (error: any) {

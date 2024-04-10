@@ -79,6 +79,16 @@ const router = createRouter({
           }
         },
         {
+          path: 'news',
+          name: 'news',
+          component: () => import('../views/NewsManagement.vue'),
+          meta: {
+            title: `${mainTitle} | 消息管理`,
+            login: true,
+            admin: true
+          }
+        },
+        {
           path: 'profile',
           name: 'profile',
           component: () => import('../views/ProfileView.vue'),
