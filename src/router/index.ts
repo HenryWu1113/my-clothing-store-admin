@@ -89,6 +89,16 @@ const router = createRouter({
           }
         },
         {
+          path: 'order',
+          name: 'order',
+          component: () => import('../views/OrderManagement.vue'),
+          meta: {
+            title: `${mainTitle} | 訂單管理`,
+            login: true,
+            admin: true
+          }
+        },
+        {
           path: 'profile',
           name: 'profile',
           component: () => import('../views/ProfileView.vue'),

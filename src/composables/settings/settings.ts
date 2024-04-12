@@ -32,5 +32,10 @@ export const managementPages = [
     key: 'news',
     text: '消息管理',
     route: 'news'
+  },
+  {
+    key: 'order',
+    text: '訂單管理',
+    route: 'order'
   }
 ]
