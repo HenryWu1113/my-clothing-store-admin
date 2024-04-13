@@ -213,8 +213,8 @@ const tableSetting: Ref<{
   tableSetting: { order: number; key: string; title: string; sortable: boolean }[]
 }> = ref({
   isLoading: false,
-  tableMinWidth: 800,
-  tableColumnWidth: [30, 20, 20, 20, 10],
+  tableMinWidth: 1000,
+  tableColumnWidth: [25, 20, 20, 20, 15],
   tableSetting: [
     {
       order: 1,
