@@ -1,5 +1,6 @@
 <template>
   <header>
+    <div class="logo" @click="$router.push('/overview')">H</div>
     <CategoriesBtns />
     <MunuBtns />
     <n-drawer class="management" v-model:show="isOpen" :width="350" placement="right">
@@ -33,6 +34,19 @@ header {
   left: 0;
   z-index: 9999;
   background: $bg-color;
+  .logo {
+    cursor: pointer;
+    height: 70%;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    background: $text-color;
+    display: flex;
+    font-weight: bold;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    color: $bg-color;
+  }
 }
 </style>
 <script lang="ts" setup>

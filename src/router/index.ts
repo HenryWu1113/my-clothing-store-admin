@@ -8,6 +8,7 @@ declare module 'vue-router' {
   interface RouteMeta {
     title: string
     login: Boolean
+    admin: Boolean
   }
 }
 
@@ -99,11 +100,41 @@ const router = createRouter({
           }
         },
         {
+          path: 'category',
+          name: 'category',
+          component: () => import('../views/CategoryManagement.vue'),
+          meta: {
+            title: `${mainTitle} | 分類管理`,
+            login: true,
+            admin: true
+          }
+        },
+        {
+          path: 'brand',
+          name: 'brand',
+          component: () => import('../views/BrandManagement.vue'),
+          meta: {
+            title: `${mainTitle} | 商城管理`,
+            login: true,
+            admin: true
+          }
+        },
+        {
           path: 'profile',
           name: 'profile',
           component: () => import('../views/ProfileView.vue'),
           meta: {
             title: `${mainTitle} | 個人資訊`,
+            login: true,
+            admin: false
+          }
+        },
+        {
+          path: 'outfit',
+          name: 'outfit',
+          component: () => import('../views/OutfitManagement.vue'),
+          meta: {
+            title: `${mainTitle} | 穿搭管理`,
             login: true,
             admin: false
           }
@@ -139,6 +170,9 @@ router.beforeEach((to, from, next) => {
     next('/overview')
   } else if (to.meta.login && !admin.isLogin) {
     next('/login')
+  } else if (to.meta.admin && admin.role !== 'manager') {
+    alert('沒有權限')
+    next('/overview')
   } else {
     next()
   }

@@ -4,10 +4,20 @@ export const menuSelection = [
     key: 'overview',
     text: '總覽',
     route: 'overview'
+  },
+  {
+    key: 'outfit',
+    text: '我的穿搭',
+    route: 'outfit'
   }
 ]
 
 export const managementPages = [
+  {
+    key: 'brand',
+    text: '商城管理',
+    route: 'brand'
+  },
   {
     key: 'staff',
     text: '員工管理',
@@ -37,5 +47,10 @@ export const managementPages = [
     key: 'order',
     text: '訂單管理',
     route: 'order'
+  },
+  {
+    key: 'category',
+    text: '分類管理',
+    route: 'category'
   }
 ]

@@ -1,6 +1,6 @@
 <template>
   <div class="page-menu-btns-wrap">
-    <div class="btn" v-for="menu in menuArr" :key="menu.key" @click="menu.onClick">
+    <div class="btn" v-for="menu in filterMenuArr" :key="menu.key" @click="menu.onClick">
       <n-icon :component="menu.icon"></n-icon>
     </div>
     <n-dropdown trigger="click" :options="currentOptions" @select="handleSelect" size="huge">
@@ -96,7 +96,7 @@ const message = useMessage()
 
 const { onOpen } = useDrawerStore()
 const admin = useAdminStore()
-const { isLogin } = storeToRefs(admin)
+const { isLogin, role } = storeToRefs(admin)
 
 /** 登入、註冊彈出的 Modal 控制實例 */
 const modalControll = ref({
@@ -212,6 +212,13 @@ const handleSelect = async (key: string | number, option: IoptionsType) => {
 /** 登入、未登入選單 */
 const currentOptions = computed(() => {
   return options.filter((item) => isLogin.value === item.login)
+})
+
+/** 是否有權限(管理者、員工) */
+const filterMenuArr = computed(() => {
+  console.log(role.value)
+  if (role.value === 'manager') return menuArr.value
+  return menuArr.value.filter((item) => item.key !== 'management')
 })
 // ----------
 
