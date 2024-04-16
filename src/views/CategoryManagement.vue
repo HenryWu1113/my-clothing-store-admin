@@ -24,18 +24,13 @@
     <div v-if="currentPage === Page.edit" class="store-setting-wrap">
       <n-form ref="formRef" :label-width="80" :model="formValue" :rules="rules" size="large">
         <n-form-item label="Key" path="key">
-          <n-input
-            v-if="formValue.categoryType === 'clothingPart'"
-            v-model:value="formValue.key"
-            placeholder="請輸入 key"
-            clearable
-          />
           <n-color-picker
             v-if="formValue.categoryType === 'color'"
             :default-value="formValue.key"
             :modes="['hex']"
             @update:value="updateColor"
           />
+          <n-input v-else v-model:value="formValue.key" placeholder="請輸入 key" clearable />
         </n-form-item>
         <n-form-item label="名稱" path="name">
           <n-input v-model:value="formValue.name" placeholder="請輸入名稱" clearable />
@@ -78,7 +73,7 @@
       </template>
       <template #td4="{ value }">
         <div>
-          {{ value === 'color' ? '顏色' : '服裝分類' }}
+          {{ categoryName(value) }}
         </div>
       </template>
       <template #td5="{ value }">
@@ -252,11 +247,12 @@ const tableSetting: Ref<{
 /** 所有分類 */
 const categories: Ref<ICategory[]> = ref([])
 
-const selectType = ref<'color' | 'clothingPart'>('color')
+const selectType = ref<'color' | 'size' | 'clothingPart'>('color')
 
 /** 分類選項 */
 const categoryTypeOptions = [
   { value: 'color', label: '顏色' },
+  { value: 'size', label: '尺寸' },
   { value: 'clothingPart', label: '服裝分類' }
 ]
 
@@ -478,6 +474,13 @@ const handleConfirm = (id: string) => {
       return deleteCategory(id)
     }
   })
+}
+
+/** 判斷分類 */
+const categoryName = (key: string) => {
+  if (key === 'color') return '顏色'
+  else if (key === 'size') return '尺寸'
+  else if (key === 'clothingPart') return '服裝分類'
 }
 
 /** 標題名切換 */

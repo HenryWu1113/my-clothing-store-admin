@@ -106,24 +106,34 @@
             </div>
             <div class="info-wrap">
               <div class="product-color">
-                <div class="title">顏色 : {{ product.color }}</div>
-                <n-radio-group size="large" v-model:value="product.color" name="color">
+                <div class="title">
+                  <p>顏色 : {{ exchangeVal(product._id, product.color._id, 'colors').name }}</p>
+                  <div
+                    class="color-ball"
+                    :style="{
+                      background: exchangeVal(product._id, product.color._id, 'colors').key
+                    }"
+                  ></div>
+                </div>
+                <n-radio-group size="large" v-model:value="product.color._id" name="color">
                   <n-radio
                     v-for="color in product.product.colors"
-                    :key="color"
-                    :value="color"
-                    :label="color"
+                    :key="color._id"
+                    :value="color._id"
+                    :label="color.name"
                   />
                 </n-radio-group>
               </div>
               <div class="product-size">
-                <div class="title">尺寸 : {{ product.size }}</div>
-                <n-radio-group size="large" v-model:value="product.size" name="size">
+                <div class="title">
+                  尺寸 : {{ exchangeVal(product._id, product.size._id, 'sizes').name }}
+                </div>
+                <n-radio-group size="large" v-model:value="product.size._id" name="size">
                   <n-radio
                     v-for="size in filterSizeSort(product.product.sizes)"
-                    :key="size"
-                    :value="size"
-                    :label="size"
+                    :key="size._id"
+                    :value="size._id"
+                    :label="size.name"
                   />
                 </n-radio-group>
               </div>
@@ -336,6 +346,16 @@
           > div {
             font-size: 1rem;
             color: $text-color;
+            .title {
+              display: flex;
+              align-items: center;
+              .color-ball {
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                margin-left: 10px;
+              }
+            }
             &.product-quantity {
               width: 100%;
               display: flex;
@@ -604,9 +624,16 @@ function editOrder(_id: string) {
   console.log(selectedStore)
 
   for (const key in formValue.value) {
-    // if (key === 'sellSeries') {
-    //   formValue.value[key] = selectedStore[key].map((item) => item._id)
-    // }
+    // if (key === 'products') {
+    //   formValue.value[key] = selectedStore[key].map((item) => {
+    //     return {
+    //       ...item,
+    //       product: item.product._id,
+    //       quantity: item.quantity,
+    //       color: item.color._id,
+    //       size: item.size._id
+    //     }
+    //   })
     // @ts-ignore
     if (selectedStore[key] !== null || selectedStore[key] !== void 0) {
       // @ts-ignore
@@ -644,10 +671,21 @@ async function submitForm() {
   const formObj: any = {}
   for (const key in formValue.value) {
     if (['_id', 'loading'].includes(key)) continue
-    else if (formValue.value[key] !== undefined && formValue.value[key] !== '') {
+    else if (key === 'products') {
+      formObj[key] = formValue.value[key].map((item: any) => {
+        return {
+          ...item,
+          color: item.color._id,
+          size: item.size._id,
+          product: item.product._id
+        }
+      })
+    } else if (formValue.value[key] !== undefined && formValue.value[key] !== '') {
       formObj[key] = formValue.value[key]
     }
   }
+
+  console.log(formObj)
 
   try {
     if (formValue.value._id.length === 0) {
@@ -684,11 +722,43 @@ const handleValidateClick = (e: MouseEvent) => {
   })
 }
 
+/**
+ * 用 _id 換值 (這特殊的資料結構讓我可以這樣寫)
+ * @param productListId 該訂單該商品清單的 id
+ * @param id 選項的 id(顏色、尺寸)
+ * @param type 查找類型(顏色、尺寸)
+ */
+const exchangeVal = (productListId: string, id: string, type: 'colors' | 'sizes') => {
+  const idxOfProduct = formValue.value.products.findIndex((item: any) => item._id === productListId)
+  if (idxOfProduct === -1) {
+    return {
+      key: '',
+      name: ''
+    }
+  }
+
+  const product = formValue.value.products[idxOfProduct].product
+
+  const idxOfCatOption = product[type].findIndex((item: any) => item._id === id)
+
+  if (idxOfCatOption === -1) {
+    return {
+      key: '',
+      name: ''
+    }
+  }
+
+  return {
+    key: product[type][idxOfCatOption].key ?? '',
+    name: product[type][idxOfCatOption].name ?? ''
+  }
+}
+
 /** 避免 sizes 當初勾選的順序不一 */
-const filterSizeSort = (sizes: string[]) => {
+const filterSizeSort = (sizes: any) => {
   return sizes.sort((a: any, b: any) => {
     const sortArr = ['XS', 'S', 'M', 'L', 'XL']
-    if (sortArr.indexOf(a) > sortArr.indexOf(b)) return 1
+    if (sortArr.indexOf(a.key) > sortArr.indexOf(b.key)) return 1
     else return -1
   })
 }

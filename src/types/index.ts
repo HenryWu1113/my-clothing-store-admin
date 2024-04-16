@@ -2,9 +2,9 @@
  * 商品資料結構格式
  */
 export interface IProduct {
-  clothingGender: 'male' | 'female'
-  clothingPart: 'shirts' | 'pants'
-  colors: string[]
+  clothingGender: '男' | '女'
+  clothingPart: string
+  colors: ICategory[]
   createdAt: string
   description: string
   discountRate: number
@@ -13,7 +13,7 @@ export interface IProduct {
   price: number
   ratings: { _id: string; score: number }[]
   sell: boolean
-  sizes: string[]
+  sizes: ICategory[]
   soldQuantity: number
   stockQuantity: number
   tags: string[]
@@ -44,8 +44,8 @@ export interface IOutfit {
   images: string[]
   products: {
     product: IProduct[]
-    color: string
-    size: string
+    color: ICategory
+    size: ICategory
     _id: string
   }[]
   show: boolean
@@ -128,9 +128,9 @@ export interface IStore {
 export interface ICart {
   _id: string
   product: IProduct
-  color: string
+  color: ICategory
   quantity: number
-  size: string
+  size: ICategory
 }
 
 /**
@@ -158,8 +158,8 @@ export interface IOrder {
   payStatus: string
   products: {
     _id: string
-    color: string
-    size: string
+    color: ICategory
+    size: ICategory
     quantity: number
     price: number
     product: IProduct

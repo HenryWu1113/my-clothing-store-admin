@@ -48,37 +48,44 @@
         <n-form-item label="服飾性別分類" path="clothingGender">
           <n-radio-group v-model:value="formValue.clothingGender" name="clothingGender">
             <n-space>
-              <n-radio key="male" value="male" label="男裝" />
-              <n-radio key="female" value="female" label="女裝" />
+              <n-radio value="男" label="男裝" />
+              <n-radio value="女" label="女裝" />
             </n-space>
           </n-radio-group>
         </n-form-item>
         <n-form-item label="服飾部分" path="clothingPart">
           <n-radio-group v-model:value="formValue.clothingPart" name="clothingPart">
             <n-space>
-              <n-radio key="shirts" value="shirts" label="上衣" />
-              <n-radio key="pants" value="pants" label="下裝" />
+              <n-radio
+                v-for="option in clothingPartOptions"
+                :value="option.key"
+                :label="option.name"
+                :key="option._id"
+              />
             </n-space>
           </n-radio-group>
         </n-form-item>
         <n-form-item label="商品顏色" path="colors">
           <n-checkbox-group v-model:value="formValue.colors">
             <n-space item-style="display: flex;">
-              <n-checkbox style="--n-color-checked: white" value="white" label="白色" />
-              <n-checkbox style="--n-color-checked: black" value="black" label="黑色" />
-              <n-checkbox style="--n-color-checked: blue" value="blue" label="藍色" />
-              <n-checkbox style="--n-color-checked: red" value="red" label="紅色" />
+              <n-checkbox
+                v-for="option in colorOptions"
+                :value="option._id"
+                :label="option.name"
+                :key="option._id"
+              />
             </n-space>
           </n-checkbox-group>
         </n-form-item>
         <n-form-item label="商品尺寸" path="sizes">
           <n-checkbox-group v-model:value="formValue.sizes">
             <n-space item-style="display: flex;">
-              <n-checkbox value="XS" label="XS" />
-              <n-checkbox value="S" label="S" />
-              <n-checkbox value="M" label="M" />
-              <n-checkbox value="L" label="L" />
-              <n-checkbox value="XL" label="XL" />
+              <n-checkbox
+                v-for="option in sizeOptions"
+                :value="option._id"
+                :label="option.name"
+                :key="option._id"
+              />
             </n-space>
           </n-checkbox-group>
         </n-form-item>
@@ -241,7 +248,7 @@ import { ArrowUndoOutline } from '@vicons/ionicons5'
 import { PictureTwotone } from '@vicons/antd'
 import { useMessage, useDialog } from 'naive-ui'
 import { api } from '@/plugins/axios'
-import type { IProduct } from '@/types'
+import type { IProduct, ICategory } from '@/types'
 
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
@@ -310,7 +317,10 @@ const tableSetting: Ref<{
   ]
 })
 
+/** 所有商品 */
 const products: Ref<IProduct[]> = ref([])
+/** 所有分類 */
+const categories: Ref<ICategory[]> = ref([])
 
 async function getAllProducts() {
   try {
@@ -324,6 +334,21 @@ async function getAllProducts() {
   tableSetting.value.isLoading = false
 }
 getAllProducts()
+
+/** 取所有分類 */
+async function getAllCategories() {
+  try {
+    tableSetting.value.isLoading = true
+    const { data } = await api().get('/categories')
+    console.log(data)
+    categories.value = data.result
+  } catch (error: any) {
+    message.error(error.isAxiosError ? error.response.data.message : error.message)
+  }
+  tableSetting.value.isLoading = false
+}
+getAllCategories()
+
 // 表單 --------------------
 
 const formRef = ref<any>(null)
@@ -334,8 +359,8 @@ const formValue: Ref<{ [key: string]: any }> = ref({
   price: 0,
   stockQuantity: 0,
   discountRate: 0,
-  clothingGender: 'male',
-  clothingPart: 'shirts',
+  clothingGender: '男',
+  clothingPart: '',
   colors: [],
   sizes: [],
   tags: [],
@@ -428,6 +453,10 @@ function editProduct(_id: string) {
     } else if (key === 'previewImages') {
       formValue.value[key] = selectedProduct.images
       // @ts-ignore
+    } else if (key === 'colors' || key === 'sizes') {
+      if (!Array.isArray(selectedProduct[key])) continue
+      formValue.value[key] = selectedProduct[key].map((item: any) => item._id)
+      // @ts-ignore
     } else if (selectedProduct[key] !== null || selectedProduct[key] !== void 0) {
       // @ts-ignore
       formValue.value[key] = selectedProduct[key]
@@ -445,8 +474,8 @@ function resetFormValue() {
     price: 0,
     stockQuantity: 0,
     discountRate: 0,
-    clothingGender: 'male',
-    clothingPart: 'shirts',
+    clothingGender: '男',
+    clothingPart: '',
     colors: [],
     sizes: [],
     tags: [],
@@ -522,19 +551,14 @@ const handleConfirm = () => {
   })
 }
 
-/** 標題名切換 */
-const pageTitle = computed(() => {
-  if (currentPage.value === Page.overview) return '商品管理'
-  else if (currentPage.value === Page.edit && formValue.value._id.length) return '編輯商品'
-  else if (currentPage.value === Page.edit && !formValue.value._id.length) return '新增商品'
-  else return '錯誤頁'
-})
-
+/** input 圖片更新觸發 */
 function imageUpdate(obj: { images: FileList; previewImages: string[] }) {
   console.log(obj)
   formValue.value.images = obj.images
   formValue.value.previewImages = obj.previewImages
 }
+
+// --------------------
 
 /** vue-quill實例 */
 const quillInstance = ref<any>(null)
@@ -554,4 +578,29 @@ const updateQuill = (_: any) => {
   console.log(quillInstance.value.root.innerHTML)
   formValue.value.description = quillInstance.value.root.innerHTML
 }
+
+// --------------------
+
+/** 標題名切換 */
+const pageTitle = computed(() => {
+  if (currentPage.value === Page.overview) return '商品管理'
+  else if (currentPage.value === Page.edit && formValue.value._id.length) return '編輯商品'
+  else if (currentPage.value === Page.edit && !formValue.value._id.length) return '新增商品'
+  else return '錯誤頁'
+})
+
+/** 服飾選項 */
+const clothingPartOptions = computed(() => {
+  return categories.value.filter((item) => item.categoryType === 'clothingPart')
+})
+
+/** 顏色選項 */
+const colorOptions = computed(() => {
+  return categories.value.filter((item) => item.categoryType === 'color')
+})
+
+/** 尺寸選項 */
+const sizeOptions = computed(() => {
+  return categories.value.filter((item) => item.categoryType === 'size')
+})
 </script>
