@@ -364,6 +364,7 @@ const formValue: Ref<{ [key: string]: any }> = ref({
   colors: [],
   sizes: [],
   tags: [],
+  ratings: [],
   images: [] as any[],
   previewImages: [] as string[],
   sell: true,
@@ -453,7 +454,7 @@ function editProduct(_id: string) {
     } else if (key === 'previewImages') {
       formValue.value[key] = selectedProduct.images
       // @ts-ignore
-    } else if (key === 'colors' || key === 'sizes') {
+    } else if (key === 'colors' || key === 'sizes' || key === 'ratings') {
       if (!Array.isArray(selectedProduct[key])) continue
       formValue.value[key] = selectedProduct[key].map((item: any) => item._id)
       // @ts-ignore
@@ -479,6 +480,7 @@ function resetFormValue() {
     colors: [],
     sizes: [],
     tags: [],
+    ratings: [],
     images: [] as any[],
     previewImages: [] as string[],
     sell: true,
@@ -493,7 +495,7 @@ async function submitForm() {
   const fd = new FormData()
   for (const key in formValue.value) {
     if (['_id', 'previewImages', 'loading'].includes(key)) continue
-    else if (['colors', 'sizes', 'tags', 'images'].includes(key)) {
+    else if (['colors', 'sizes', 'tags', 'images', 'ratings'].includes(key)) {
       for (const val of formValue.value[key]) {
         fd.append(key, val)
       }
