@@ -167,12 +167,12 @@ router.beforeEach((to, from, next) => {
   const admin = useAdminStore()
 
   if (admin.isLogin && (to.path === '/login' || to.path === '/')) {
-    next('/overview')
+    next('/outfit')
   } else if (to.meta.login && !admin.isLogin) {
     next('/login')
   } else if (to.meta.admin && admin.role !== 'manager') {
     alert('沒有權限')
-    next('/overview')
+    next('/outfit')
   } else {
     next()
   }

@@ -1,6 +1,6 @@
 <template>
   <header>
-    <div class="logo" @click="$router.push('/overview')">H</div>
+    <div class="logo">H</div>
     <CategoriesBtns />
     <MunuBtns />
     <n-drawer class="management" v-model:show="isOpen" :width="350" placement="right">

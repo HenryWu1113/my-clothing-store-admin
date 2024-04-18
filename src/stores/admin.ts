@@ -34,7 +34,7 @@ export const useAdminStore = defineStore(
     async function login(form: { account: string; password: string }) {
       const { data } = await api().post('/admins/login', form)
       console.log(data)
-      router.push('/overview')
+      router.push('/outfit')
       token.value = data.result.token
       getAdmin()
     }

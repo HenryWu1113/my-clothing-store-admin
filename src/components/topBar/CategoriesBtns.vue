@@ -2,7 +2,7 @@
   <div class="category-btns-wrap">
     <div
       class="btn"
-      v-for="menu in menuSelection"
+      v-for="menu in filterMunu"
       :key="menu.key"
       @click="$router.push(`/${menu.route}`)"
     >
@@ -31,5 +31,18 @@
 }
 </style>
 <script setup lang="ts">
+import { computed } from 'vue'
 import { menuSelection } from '@/composables/settings/settings'
+import { useAdminStore } from '@/stores/admin'
+import { storeToRefs } from 'pinia'
+
+const { role } = storeToRefs(useAdminStore())
+
+const filterMunu = computed(() => {
+  if (role.value === 'manager') {
+    return menuSelection
+  } else {
+    return menuSelection.filter((item) => item.key !== 'overview')
+  }
+})
 </script>
