@@ -83,7 +83,14 @@
         <div class="outfit-products-wrap">
           <div class="title">
             <p>穿搭單品</p>
-            <n-button>加入商品</n-button>
+            <n-button
+              @click="
+                onOpen(() => {
+                  productProps = undefined
+                })
+              "
+              >加入商品</n-button
+            >
           </div>
           <div class="products">
             <div class="product-list" v-for="product in formValue.products" :key="product._id">
@@ -93,8 +100,12 @@
               <div class="product-info">
                 <div class="name">
                   <p>{{ productInfo(product.product, 'name') }}</p>
-                  <n-icon :component="Pencil"></n-icon>
-                  <n-icon class="delete" :component="TrashOutline"></n-icon>
+                  <n-icon :component="Pencil" @click="editfitProduct(product.product._id)"></n-icon>
+                  <n-icon
+                    class="delete"
+                    :component="TrashOutline"
+                    @click="deleteOutfitProduct(product.product._id)"
+                  ></n-icon>
                 </div>
                 <div class="size">尺寸 : {{ product.size.name }}</div>
                 <div class="color">顏色 : {{ product.color.name }}</div>
@@ -130,6 +141,12 @@
         </n-form-item>
       </n-form>
     </div>
+    <ProductModal
+      :isOpen="isOpen"
+      :onClose="onClose"
+      :product-props="productProps"
+      @update="updateOutfitProduct"
+    />
   </div>
 </template>
 
@@ -344,20 +361,25 @@
 </style>
 
 <script setup lang="ts">
-import { ref, shallowRef, computed, watch, type Ref } from 'vue'
+import { ref, shallowRef, computed, toRaw, type Ref } from 'vue'
 import { useMessage, useLoadingBar } from 'naive-ui'
 import { api } from '@/plugins/axios'
-import type { IAdmin, IOutfit } from '@/types'
+import type { ICategory, IProduct, IOutfit } from '@/types'
 import { useRouter, useRoute } from 'vue-router'
 import { useAdminStore } from '@/stores/admin'
 import { storeToRefs } from 'pinia'
 import { ArrowUndoOutline, Pencil, TrashOutline } from '@vicons/ionicons5'
 import { PictureTwotone } from '@vicons/antd'
 import { numberToCommaString, compareObjects, formatTime } from '@/composables'
+import { useProductModalStore } from '@/stores/useProductModalStore'
 
 import OutfitCard from '@/components/cards/OutfitCard.vue'
 import TitleBar from '@/components/TitleBar.vue'
 import InputImage from '@/components/InputImage.vue'
+import ProductModal from '@/components/modals/ProductModal.vue'
+
+const { onOpen, onClose } = useProductModalStore()
+const { isOpen } = storeToRefs(useProductModalStore())
 
 enum Page {
   overview = '1',
@@ -389,9 +411,53 @@ const {
   store
 } = storeToRefs(useAdminStore())
 
+type simplifyProductType = Omit<IProduct, 'colors' | 'sizes'> & {
+  colors: string[]
+  sizes: string[]
+}
+
 const clerkOutfits = ref<IOutfit[]>([])
 
-const rules = {}
+/**
+ * 傳進選單品的彈窗的資訊
+ * @property {string} productId 商品 id
+ * @property {string} color 顏色 id
+ * @property {string} size 尺寸 id
+ */
+const productProps = ref<undefined | { productId: string; color: string; size: string }>(undefined)
+
+const rules = {
+  outfitName: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator(rule: any, value: string) {
+      if (value.length === 0) {
+        return new Error('穿搭名稱必填')
+      }
+      return true
+    }
+  },
+  description: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator(rule: any, value: string) {
+      if (value.length === 0) {
+        return new Error('穿搭描述必填')
+      }
+      return true
+    }
+  },
+  images: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator(rule: any, value: string) {
+      if (value.length === 0 && formValue.value.previewImages.length === 0) {
+        return new Error('至少需要一張穿搭照')
+      }
+      return true
+    }
+  }
+}
 
 // 表單 --------------------
 
@@ -431,8 +497,8 @@ async function getClerkOutfits() {
 getClerkOutfits()
 
 /**
- * 編輯商品
- * @param _id 商品 _id
+ * 編輯穿搭
+ * @param _id 穿搭 _id
  */
 function editOutfit(_id: string) {
   console.log(_id)
@@ -474,21 +540,37 @@ function resetFormValue() {
 
 /** 新增編輯商品送 api */
 async function submitForm() {
-  formValue.value.loading = true
   const fd = new FormData()
+
   for (const key in formValue.value) {
     if (['_id', 'previewImages', 'loading'].includes(key)) continue
-    else if (['colors', 'sizes', 'tags', 'images', 'ratings'].includes(key)) {
+    else if (key === 'images') {
       for (const val of formValue.value[key]) {
         fd.append(key, val)
+      }
+    } else if (key === 'products') {
+      if (formValue.value[key].length === 0) return message.warning('至少選擇一件穿搭商品')
+      for (const product of formValue.value[key]) {
+        // @ts-ignore
+        fd.append(
+          key,
+          JSON.stringify({
+            product: product.product._id,
+            color: product.color._id,
+            size: product.size._id
+          })
+        )
       }
     } else {
       fd.append(key, formValue.value[key])
     }
   }
 
+  formValue.value.loading = true
+
   try {
     if (formValue.value._id.length === 0) {
+      fd.append('clerk', adminId.value)
       await api('auth').post('/outfits', fd)
 
       message.success('新增成功')
@@ -532,6 +614,59 @@ function firstProductImg(product: any) {
 /** 回傳商品資訊(不知為什麼定義好 type 還找不到型別...) */
 function productInfo(product: any, key: string) {
   return product[key]
+}
+
+/**
+ * 更新穿搭單品 (emit function)
+ * @param outfitProduct
+ */
+function updateOutfitProduct(outfitProduct: {
+  color: ICategory
+  size: ICategory
+  product: simplifyProductType
+}) {
+  console.log(outfitProduct)
+
+  const idx = formValue.value.products.findIndex(
+    (product: any) => product.product._id === outfitProduct.product._id
+  )
+  if (idx === -1) {
+    formValue.value.products.push(outfitProduct)
+    message.info('新增穿搭商品')
+  } else {
+    formValue.value.products[idx] = outfitProduct
+    message.info('更新穿搭商品屬性')
+  }
+}
+
+/**
+ * 編輯穿搭單品
+ * @param id 商品 id
+ */
+function editfitProduct(id: string) {
+  const idx = formValue.value.products.findIndex((item: any) => item.product._id)
+  if (idx === -1) return
+
+  productProps.value = {
+    productId: id,
+    color: formValue.value.products[idx].color._id,
+    size: formValue.value.products[idx].size._id
+  }
+
+  onOpen()
+}
+
+/**
+ * 刪除穿搭單品
+ * @param id 商品 id
+ */
+function deleteOutfitProduct(id: string) {
+  console.log(id)
+  formValue.value = {
+    ...toRaw(formValue.value),
+    products: formValue.value.products.filter((item: any) => item.product._id !== id)
+  }
+  console.log(formValue.value)
 }
 
 /** input 圖片更新觸發 */
