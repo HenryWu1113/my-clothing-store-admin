@@ -35,12 +35,14 @@
               <n-input-number
                 v-model:value="formValue.freeDeliveryFee"
                 placeholder="請輸入免運金額"
+                :min="0"
               ></n-input-number>
             </n-form-item>
             <n-form-item label="運費" path="deliveryFee">
               <n-input-number
                 v-model:value="formValue.deliveryFee"
                 placeholder="請輸入運費"
+                :min="0"
               ></n-input-number>
             </n-form-item>
           </div>
@@ -194,7 +196,18 @@ const formValue = ref({
   loading: false
 })
 
-const rules = {}
+const rules = {
+  name: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator(rule: any, value: string) {
+      if (value.length === 0) {
+        return new Error('商城名稱必填')
+      }
+      return true
+    }
+  }
+}
 
 function resetForm() {
   page.value = PAGE.overview
@@ -207,7 +220,7 @@ function resetForm() {
   }
 }
 
-/** 取所有訂單 */
+/** 取所有商城 */
 async function getMyBrand() {
   try {
     loading.value = true
@@ -222,8 +235,8 @@ async function getMyBrand() {
 getMyBrand()
 
 /**
- * 編輯訂單資訊
- * @param _id 訂單 _id
+ * 編輯商城資訊
+ * @param _id 商城 _id
  */
 function editBrand() {
   page.value = PAGE.edit
@@ -254,7 +267,7 @@ async function submitForm() {
 
   try {
     await api('auth').patch(`/brands/${formValue.value._id}`, formObj)
-    message.success('更新訂單資訊成功')
+    message.success('更新商城資訊成功')
 
     getMyBrand()
   } catch (error: any) {

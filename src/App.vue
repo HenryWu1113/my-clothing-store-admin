@@ -1,9 +1,5 @@
 <template>
-  <n-config-provider
-    :locale="locale"
-    :date-locale="dateLocale"
-    :theme="isLight ? void 0 : darkTheme"
-  >
+  <n-config-provider :locale="locale" :date-locale="dateLocale" :theme="currentTheme">
     <n-loading-bar-provider>
       <n-message-provider>
         <n-dialog-provider>
@@ -18,7 +14,7 @@
 <style lang="scss" scoped></style>
 
 <script setup lang="ts">
-import { ref, reactive, shallowRef, h } from 'vue'
+import { ref, computed } from 'vue'
 import { RouterView } from 'vue-router'
 import { darkTheme } from 'naive-ui'
 import type { NLocale, NDateLocale } from 'naive-ui'
@@ -39,6 +35,11 @@ const dateLocale = ref(null as NDateLocale | null)
 if (!isLogin.value) {
   router.push('/login')
 }
+
+const currentTheme = computed(() => {
+  if (!isLogin.value) return darkTheme
+  return isLight.value ? void 0 : darkTheme
+})
 
 getAdmin()
 </script>

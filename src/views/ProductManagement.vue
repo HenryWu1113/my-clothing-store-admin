@@ -165,7 +165,7 @@
       <template #td6="{ value }">
         <div class="edit-wrap">
           <n-button type="info" ghost @click="editProduct(value)"> 編輯 </n-button>
-          <n-button type="error" ghost @click="handleConfirm">刪除</n-button>
+          <n-button v-if="false" type="error" ghost @click="handleConfirm">刪除</n-button>
         </div>
       </template>
     </MydataTable>
@@ -276,7 +276,7 @@ const tableSetting: Ref<{
 }> = ref({
   isLoading: false,
   tableMinWidth: 800,
-  tableColumnWidth: [],
+  tableColumnWidth: [15, 20, 20, 25, 10, 10],
   tableSetting: [
     {
       order: 1,

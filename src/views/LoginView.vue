@@ -2,8 +2,7 @@
   <div class="login-page">
     <div class="login-wrap">
       <div class="modal-title">
-        <p>登入</p>
-        <n-icon :component="Times"></n-icon>
+        <p>後台登入</p>
       </div>
       <div class="modal-body">
         <n-form ref="formRef" :label-width="80" :model="formValue" :rules="rules" size="large">
@@ -36,29 +35,21 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: $text-color;
+  background: rgb(223, 223, 223);
   .login-wrap {
     width: 500px;
-    border: 1px solid $text-color;
+    border: 1px solid gray;
     border-radius: 10px;
-    background: $bg-color;
+    background: rgb(117, 117, 117);
     .modal-title {
       position: relative;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: center;
       padding: 1rem;
-      font-size: 18px;
+      font-size: 1.5rem;
       font-weight: bold;
-      > p {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-      }
-      > .n-icon {
-        cursor: pointer;
-      }
+      color: white;
     }
 
     .modal-body {

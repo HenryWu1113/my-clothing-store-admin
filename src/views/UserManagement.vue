@@ -212,7 +212,7 @@ const tableSetting: Ref<{
 }> = ref({
   isLoading: false,
   tableMinWidth: 800,
-  tableColumnWidth: [],
+  tableColumnWidth: [25, 15, 15, 10, 20, 15],
   tableSetting: [
     {
       order: 1,

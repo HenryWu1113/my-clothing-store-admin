@@ -224,7 +224,7 @@ const tableSetting: Ref<{
     {
       order: 4,
       key: '_id',
-      title: '編輯',
+      title: '',
       sortable: false
     }
   ]
