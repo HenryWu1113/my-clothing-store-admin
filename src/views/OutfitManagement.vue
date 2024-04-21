@@ -20,7 +20,7 @@
         </div>
         <div class="clerk-info">
           <div class="name">{{ name }} | {{ height ?? '??' }}cm | {{ weight ?? '??' }}kg</div>
-          <div class="store">{{ store }} ></div>
+          <div class="store">{{ '<' }} {{ store }} ></div>
           <div class="introduce">{{ introduce ?? '這個店員自我介紹什麼都沒寫唷!!' }}</div>
         </div>
       </div>

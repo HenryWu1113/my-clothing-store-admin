@@ -44,10 +44,18 @@
               </div>
               <n-button strong type="tertiary" attr-type="submit" @click="confirm()">確認</n-button>
             </div>
+            <div class="filter-wrap">
+              <n-input
+                v-model:value="query"
+                type="text"
+                clearable
+                placeholder="請輸入商品名"
+              ></n-input>
+            </div>
             <div class="product-wrap" v-if="!productProps">
               <img
                 @click="selectProduct(product._id)"
-                v-for="product in products"
+                v-for="product in filterProduct"
                 :key="product._id"
                 :src="product.images[0]"
               />
@@ -78,7 +86,7 @@
     border-radius: 10px;
     width: 60%;
     animation: onOpen 0.5s ease forwards;
-    max-height: 1000px;
+    max-height: 850px;
     overflow: auto;
     &.close {
       animation: onClose 0.5s ease forwards;
@@ -209,6 +217,8 @@ const emit = defineEmits<{
 }>()
 
 const products = ref<IProduct[]>([])
+const query = ref('')
+
 const loading = ref(false)
 
 const selectedProduct = ref<IProduct>({
@@ -363,6 +373,12 @@ const currentSize = computed(() => {
       updatedAt: ''
     }
   return selectedProduct.value.sizes[idx]
+})
+
+const filterProduct = computed(() => {
+  console.log(query.value)
+  if (query.value === '') return products.value
+  return products.value.filter((item) => item.name.includes(query.value))
 })
 
 // 開啟彈窗取所有服飾
