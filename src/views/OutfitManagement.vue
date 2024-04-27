@@ -8,7 +8,7 @@
         <n-icon
           v-if="currentPage === Page.edit"
           :component="ArrowUndoOutline"
-          @click="(currentPage = Page.overview), resetFormValue()"
+          @click="(currentPage = Page.overview), resetFormValue(), getClerkOutfits()"
         ></n-icon>
       </template>
     </TitleBar>

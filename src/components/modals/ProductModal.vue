@@ -2,7 +2,7 @@
   <Teleport to="body">
     <transition name="modal">
       <div v-if="isOpen" class="modal-mask">
-        <div class="modal">
+        <div id="p-modal" class="modal">
           <div class="modal-title">
             <p>商品選擇</p>
             <n-icon :component="Times" @click="onClose(), addCloseClass()"></n-icon>
@@ -293,6 +293,10 @@ function selectProduct(id: String) {
   const idx = products.value.findIndex((item) => item._id === id)
   if (idx === -1) return
   selectedProduct.value = products.value[idx]
+
+  const wrap: HTMLElement = document.querySelector('#p-modal')!
+  if (!wrap) return
+  wrap.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 function resetAll() {
