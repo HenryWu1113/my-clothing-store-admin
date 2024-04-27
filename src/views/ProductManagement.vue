@@ -29,7 +29,7 @@
             />
           </div>
           <div>
-            <p>配送狀態</p>
+            <p>關鍵字查詢</p>
             <n-input
               type="text"
               placeholder="商品名稱"
