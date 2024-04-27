@@ -9,9 +9,38 @@
   >
     <TitleBar :pageTitle="pageTitle">
       <template #End>
-        <n-button v-if="currentPage === Page.overview" @click="currentPage = Page.edit"
-          >新增商品</n-button
-        >
+        <div v-if="currentPage === Page.overview" class="selection-wrap">
+          <div>
+            <p>性別</p>
+            <n-select
+              v-model:value="productQuery.clothingGender"
+              :options="[
+                { value: 'All', label: '全部' },
+                { value: '男', label: '男' },
+                { value: '女', label: '女' }
+              ]"
+            />
+          </div>
+          <div>
+            <p>分類</p>
+            <n-select
+              v-model:value="productQuery.category"
+              :options="[{ value: 'All', label: '全部' }, ...categoryOptions]"
+            />
+          </div>
+          <div>
+            <p>配送狀態</p>
+            <n-input
+              type="text"
+              placeholder="商品名稱"
+              v-model:value="productQuery.keyword"
+              clearable
+            ></n-input>
+          </div>
+          <n-button v-if="currentPage === Page.overview" @click="currentPage = Page.edit"
+            >新增商品</n-button
+          >
+        </div>
         <n-icon
           v-if="currentPage === Page.edit"
           :component="ArrowUndoOutline"
@@ -142,7 +171,7 @@
     </div>
     <MydataTable
       v-if="currentPage === Page.overview"
-      :tableData="products"
+      :tableData="filterProducts"
       :tableMinWidth="tableSetting.tableMinWidth"
       :tableSetting="tableSetting.tableSetting"
       :tableColumnWidth="tableSetting.tableColumnWidth"
@@ -179,6 +208,23 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  .selection-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    > div {
+      display: flex;
+      flex-direction: column;
+      // align-items: center;
+      > p {
+        color: $text-color;
+        font-size: 14px;
+      }
+      > .n-select {
+        width: 150px;
+      }
+    }
+  }
   .n-icon {
     font-size: 2rem;
     cursor: pointer;
@@ -322,6 +368,14 @@ const products: Ref<IProduct[]> = ref([])
 /** 所有分類 */
 const categories: Ref<ICategory[]> = ref([])
 
+const productQuery = ref({
+  clothingGender: 'All',
+  category: 'All',
+  keyword: ''
+})
+
+const categoryOptions = ref<{ value: string; label: string }[]>([])
+
 async function getAllProducts() {
   try {
     tableSetting.value.isLoading = true
@@ -342,6 +396,12 @@ async function getAllCategories() {
     const { data } = await api().get('/categories')
     console.log(data)
     categories.value = data.result
+    categoryOptions.value = data.result
+      .filter((item: any) => item.categoryType === 'clothingPart')
+      .map((item: any) => ({
+        value: item.key,
+        label: item.name
+      }))
   } catch (error: any) {
     message.error(error.isAxiosError ? error.response.data.message : error.message)
   }
@@ -604,5 +664,27 @@ const colorOptions = computed(() => {
 /** 尺寸選項 */
 const sizeOptions = computed(() => {
   return categories.value.filter((item) => item.categoryType === 'size')
+})
+
+/** 篩選後的商品 */
+const filterProducts = computed(() => {
+  return products.value.filter((item) => {
+    if (
+      productQuery.value.clothingGender !== 'All' &&
+      productQuery.value.clothingGender !== item.clothingGender
+    ) {
+      return false
+    }
+    if (
+      productQuery.value.category !== 'All' &&
+      productQuery.value.category !== item.clothingPart
+    ) {
+      return false
+    }
+    if (!item.name.toLowerCase().includes(productQuery.value.keyword.toLowerCase())) {
+      return false
+    }
+    return true
+  })
 })
 </script>
